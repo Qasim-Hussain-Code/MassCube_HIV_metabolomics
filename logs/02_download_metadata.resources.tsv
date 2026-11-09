@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+02_download_metadata	55	44	4.53	4.53	229 raw files, 72715682516 bytes	2026-11-09T17:46:32+0800
