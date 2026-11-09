@@ -136,9 +136,13 @@ R_VERSION="$("${RS[@]}" -e 'cat(R.version.string)' 2>/dev/null | tr -d '\r')"
 
 "${PY[@]}" "$ROOT/scripts/lib/record_versions.py" --root "$(winpath "$ROOT")" \
     --trfp-version "$TRFP_VERSION" --trfp-source "$TRFP_SOURCE" --trfp-sha256 "$TRFP_SHA" --r-version "$R_VERSION" 2>&1 | tee -a "$LOG"
-# The lock file names exact builds; the local prefix line is dropped
-# because it is a path on the build machine.
-"$CONDA" env export -p "$(winpath "$ENV")" 2>/dev/null | tr -d '\r' | grep -v '^prefix:' > "$ROOT/config/environment.lock.yml"
+# The lock file names exact builds. Every conda package here comes from
+# conda-forge, but conda lists the channels of the local configuration
+# (on the build machine that added "defaults"), so the export is pinned to
+# conda-forge; the name and prefix lines would otherwise be paths on the
+# build machine.
+"$CONDA" env export -p "$(winpath "$ENV")" --override-channels -c conda-forge 2>/dev/null | tr -d '\r' \
+    | grep -v '^prefix:' | sed 's/^name: .*/name: masscube_hiv/' > "$ROOT/config/environment.lock.yml"
 
 set_conf CONDA_EXE_PATH "$CONDA"
 set_conf ENV_PREFIX "$ENV"
@@ -149,13 +153,12 @@ set_conf TRFP "$TRFP"
 echo "01_install: cleaning caches" | tee -a "$LOG"
 "$CONDA" clean -a -y 2>&1 | tail -3 | tee -a "$LOG"
 "${PY[@]}" -m pip cache purge 2>&1 | tee -a "$LOG" || true
-rm -rf "$ROOT/.cache/tmp" "$ROOT/.cache/pip"
+# conda clean keeps the extracted packages an environment uses. On the
+# same drive they are hard links to the files in env/, so deleting them
+# frees no space; it does stop every size measurement counting those
+# files twice, and the cache is not needed once env/ exists.
+rm -rf "$ROOT/.cache/tmp" "$ROOT/.cache/pip" "$ROOT/.cache/conda_pkgs"
 mkdir -p "$ROOT/.cache/tmp"
-
-# Measured once here; later stages add it to a walk of the rest of the
-# tree instead of walking env/ again (see project_bytes in common.sh).
-ENV_BYTES="$({ du -sb "$ENV" 2>/dev/null || true; } | awk '{print $1 + 0}')"
-set_conf ENV_BYTES "$ENV_BYTES"
-echo "01_install: env/ is $(gb "$ENV_BYTES") GB after cleaning" | tee -a "$LOG"
+echo "01_install: env/ is $(gb "$(any_python -I "$ROOT/scripts/lib/disk_usage.py" "$(native_path "$ENV")")") GB after cleaning" | tee -a "$LOG"
 
 stage_finish "$STAGE" NA "masscube $("${PY[@]}" -c 'import importlib.metadata as m; print(m.version("masscube"))'), $R_VERSION, ThermoRawFileParser $TRFP_VERSION"

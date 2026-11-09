@@ -22,7 +22,7 @@ import urllib.request
 from importlib.metadata import distributions, version
 from pathlib import Path
 
-ZENODO_DB_RECORD = "19121645"  # the version the brief names; newer ones are looked for below
+ZENODO_DB_RECORD = "19121645"  # any version of the record; the newest is looked up from it below
 
 
 def fetch_json(url: str, tries: int = 4) -> dict:
