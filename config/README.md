@@ -1,0 +1,8 @@
+# config/
+
+- `environment.yml`: the conda specification, conda-forge only. Bioconductor packages are installed by `scripts/lib/install_r_packages.R` inside that R, and ThermoRawFileParser from its GitHub release on Windows, because bioconda has no Windows builds.
+- `environment.lock.yml`, `python_packages.tsv`, `r_packages.tsv`, `tool_versions.tsv`: what `scripts/01_install.sh` actually installed, written by it and not edited by hand. `tool_versions.tsv` also names the MassCube MS/MS database version on Zenodo and its md5, which the annotation stage checks the download against.
+- `external_checksums.tsv`: the sha256 of the ThermoRawFileParser zip, recorded at first retrieval because the release publishes none.
+- `sample_table_pos.csv`, `sample_table_neg.csv`: MassCube sample tables built from the ISA-Tab by `scripts/03_sample_table.sh`. `is_qc` and `is_blank` are "yes"/"no" strings because that is the only form MassCube reads; `injection_order` and `batch` are filled from the acquisition timestamps once a mode has been converted. Files are linked to participants by the assay tables' Extract Name (see `preregistration.md`, section 3).
+- `masscube_parameters_pos.csv`, `masscube_parameters_neg.csv`: the MassCube parameter files used, identical except for `ion_mode`. `correct_rt` and `signal_normalization` start as `false`; the QC rules of `preregistration.md`, section 7, may switch them on, in which case the file is rewritten and the change committed with the table that decided it.
+- `tian2024_claims.tsv`: the published claims with their PubChem and KEGG identifiers, written by `scripts/lib/build_claims.py` before the authors' metabolite assignment files were opened.
