@@ -1,0 +1,7 @@
+label	started	elapsed_s	peak_rss_mb	exit_code
+02_download_metadata	2026-11-09T17:45:40+0800	49.9	44	0
+03_sample_table	2026-11-09T17:46:36+0800	0.6	2	0
+03_sample_table	2026-11-09T17:47:31+0800	0.2	15	0
+04_pilot_pos	2026-11-09T19:13:09+0800	239.6	923	1
+04_pilot_pos	2026-11-09T19:19:14+0800	181.2	854	0
+04_pilot_pos	2026-11-09T19:25:41+0800	189.1	914	0
