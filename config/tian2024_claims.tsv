@@ -1,0 +1,12 @@
+claim_type	claim	published	kegg_id	pubchem_query	pubchem_cid	inchikey	formula	monoisotopic_mass	retrieved
+metabolite	N-acetyl-L-glutamate 5-semialdehyde	higher in PLWH	C01250	N-acetyl-L-glutamate 5-semialdehyde	192878	BCPSFKBPHHBDAI-LURJTMIESA-N	C7H11NO4	173.06880783	2026-11-09
+metabolite	11b-hydroxyandrost-4-ene-3,17-dione	higher in PLWH	C05284	11b-hydroxyandrost-4-ene-3,17-dione	7092795	WSCUHXPGYUMQEX-GBHAUCNQSA-N	C19H26O3	302.18819469	2026-11-09
+metabolite	17alpha,21-dihydroxypregnenolone	higher in PLWH	C05487	17alpha,21-dihydroxypregnenolone	192735	JNHJGXQUDOYJAK-IYRCEVNGSA-N	C21H32O4	348.23005950	2026-11-09
+metabolite	N-acetyl-L-phenylalanine	lower in PLWH	C03519	N-acetyl-L-phenylalanine	74839	CBQJSKKFNMDLON-JTQLQIEISA-N	C11H13NO3	207.08954328	2026-11-09
+metabolite	trehalose	lower in PLWH	C01083	trehalose	7427	HDTRYLNUVZCQOY-LIZSDCNHSA-N	C12H22O11	342.11621151	2026-11-09
+pathway	phenylalanine metabolism	p = 0.005	hsa00360						2026-11-09
+pathway	arginine and proline metabolism	p = 0.007	hsa00330						2026-11-09
+pathway	phenylalanine, tyrosine and tryptophan biosynthesis	p = 0.0256	hsa00400						2026-11-09
+pathway	arginine biosynthesis	p = 0.0457	hsa00220						2026-11-09
+count	metabolites analysed	829							2026-11-09
+count	differential metabolites	292							2026-11-09
