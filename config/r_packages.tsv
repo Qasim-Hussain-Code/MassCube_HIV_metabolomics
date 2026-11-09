@@ -1,0 +1,11 @@
+package	version	r_version	bioconductor	recorded
+BiocManager	1.30.27	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+data.table	1.18.6.1	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+ggplot2	4.0.3	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+ggrepel	0.9.8	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+jsonlite	2.0.0	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+limma	3.68.5	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+patchwork	1.3.2	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+ropls	1.44.0	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+statmod	1.5.2	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
+vegan	2.7-6	R version 4.6.2 (2026-10-29 ucrt)	3.23	2026-11-09T17:28:22+0800
