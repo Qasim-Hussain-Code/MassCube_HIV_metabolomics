@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+01_install	112	NA	4.83	2.86	masscube 1.2.22, R version 4.6.2 (2026-10-29 ucrt), ThermoRawFileParser 1.4.5	2026-11-09T19:18:02+0800
