@@ -1,0 +1,41 @@
+# Spectra, their conversions and the MS/MS database. A raw file here is
+# about 300 MB and the database alone is 3.3 GB; the download stages
+# fetch and checksum them again, so none of it belongs in the history.
+data/
+!data/README.md
+work/
+*.raw
+*.RAW
+*.mzML
+*.mzml
+*.mzpkl
+*.pkl
+*.msp
+
+# The conda environment, Miniforge if it had to be installed here, and
+# every package cache. They sit inside the project on purpose, so that
+# `du -sb .` measures the whole footprint against the disk budget.
+env/
+miniforge/
+.cache/
+
+# Machine configuration written by scripts/00_configure.sh
+project.conf
+
+# Console logs and stage stamps are specific to one run; the measured
+# resource tables beside them are tracked.
+logs/*.log
+logs/*.done
+
+# Python and R session files
+__pycache__/
+*.py[cod]
+.Rhistory
+.RData
+.Rproj.user/
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
