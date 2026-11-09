@@ -1,0 +1,9 @@
+mode	subgroup	group	n	not_in_assay_table
+positive	HC	HC	34	0
+positive	INR	PLWH	32	0
+positive	IR	PLWH	38	0
+positive	QC	QC	11	1
+negative	HC	HC	34	0
+negative	INR	PLWH	32	0
+negative	IR	PLWH	38	0
+negative	QC	QC	10	0
