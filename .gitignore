@@ -1,7 +1,9 @@
 # Spectra, their conversions and the MS/MS database. A raw file here is
 # about 300 MB and the database alone is 3.3 GB; the download stages
 # fetch and checksum them again, so none of it belongs in the history.
-data/
+# data/* rather than data/: git cannot re-include a file inside an
+# excluded directory, and data/README.md has to be tracked.
+data/*
 !data/README.md
 work/
 *.raw
