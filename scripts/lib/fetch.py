@@ -25,18 +25,12 @@ import time
 import urllib.error
 import urllib.request
 
-USER_AGENT = "MassCube_HIV_metabolomics download script (urllib)"
-
-
 class DownloadError(RuntimeError):
     pass
 
 
 def _request(url: str, method: str = "GET", headers: dict | None = None):
-    h = {"User-Agent": USER_AGENT}
-    if headers:
-        h.update(headers)
-    return urllib.request.urlopen(urllib.request.Request(url, method=method, headers=h), timeout=180)
+    return urllib.request.urlopen(urllib.request.Request(url, method=method, headers=headers or {}), timeout=180)
 
 
 def remote_size(url: str, tries: int = 6) -> tuple[int, str]:

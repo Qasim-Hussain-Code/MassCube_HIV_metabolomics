@@ -25,8 +25,8 @@ while Sample Name holds the same 114 names in another order, the ten QCs
 first. Read literally it would assign 40 files to the wrong group. The
 negative table is consistent in every column. The script checks those
 agreements on every run and writes them to
-results/isa_assay_consistency.tsv, so the reason for the choice is
-regenerated with the tables.
+results/isa_assay_consistency.tsv, so the evidence for the choice is
+rebuilt every time the tables are.
 
 Usage: python build_sample_tables.py --root ROOT
 """

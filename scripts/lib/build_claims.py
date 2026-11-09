@@ -44,7 +44,7 @@ def get(url: str, tries: int = 5) -> str:
     last = None
     for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "MassCube_HIV_metabolomics"}), timeout=120) as r:
+            with urllib.request.urlopen(url, timeout=120) as r:
                 return r.read().decode("utf-8")
         except OSError as e:
             last = e
