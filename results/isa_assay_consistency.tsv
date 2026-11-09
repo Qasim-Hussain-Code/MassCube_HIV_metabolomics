@@ -1,0 +1,3 @@
+mode	assay_table	rows	extract_name_matches_file	ms_assay_name_matches_file	derived_spectral_data_file_matches_file	normalization_name_matches_file	sample_name_matches_file	files_whose_group_differs_by_sample_name	link_used
+positive	a_MTBLS9264_LC-MS_positive_reverse-phase_metabolite_profiling.txt	114	114	114	114	114	0	40	Extract Name
+negative	a_MTBLS9264_LC-MS_negative_reverse-phase_metabolite_profiling.txt	114	114	114	114	114	114	0	Extract Name
