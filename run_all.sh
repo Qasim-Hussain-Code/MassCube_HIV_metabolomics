@@ -49,6 +49,9 @@ stage 00 "configure" bash "$ROOT/scripts/00_configure.sh" --yes
 stage 01 "install" bash "$ROOT/scripts/01_install.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 02 "study metadata" bash "$ROOT/scripts/02_download_metadata.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 03 "sample tables" bash "$ROOT/scripts/03_sample_table.sh" "${FORCE[@]+"${FORCE[@]}"}"
+# The full positive mode follows only once the pilot's m/z tolerance rule
+# (preregistration.md, section 7) has been applied; that stage comes next.
+stage 04 "positive mode, pilot" bash "$ROOT/scripts/04_process_mode.sh" --mode pos --pilot "${FORCE[@]+"${FORCE[@]}"}"
 
 {
     printf "stage\telapsed_s\tpeak_rss_mb\tdisk_before_gb\tdisk_after_gb\tnote\n"
