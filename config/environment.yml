@@ -1,0 +1,34 @@
+# Conda environment for MassCube_HIV_metabolomics, built into ./env by
+# scripts/01_install.sh so that it is counted in the disk budget.
+#
+# conda-forge only: bioconda has no Windows builds, so ThermoRawFileParser
+# comes from its GitHub release on Windows (bioconda elsewhere) and the
+# Bioconductor packages are installed by BiocManager inside this R, the
+# same arrangement as a conda R on Windows needs anyway. MassCube pins
+# numpy below 2, ms_entropy 1.3.4 and pyteomics 4.6.3 itself; the
+# scientific stack is taken from conda-forge so that pip only adds pure
+# Python packages and wheels. Installed versions are recorded in
+# config/python_packages.tsv, config/r_packages.tsv and
+# config/environment.lock.yml after installation.
+name: masscube_hiv
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.11
+  - pip
+  - numpy<2
+  - pandas>=2.2.1
+  - scipy
+  - scikit-learn
+  - statsmodels
+  - matplotlib-base
+  - lxml
+  - joblib
+  - tqdm
+  - umap-learn
+  - psutil
+  - r-base>=4.5
+  - shellcheck
+  - pip:
+      - masscube==1.2.22
