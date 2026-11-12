@@ -206,17 +206,26 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     keep = ~meta["conditioning_qc"].astype(bool)
     meta_n = meta[keep].reset_index(drop=True)
     dropped = list(meta.loc[~keep, meta.columns[0]])
-    for quant in ("peak_height", "peak_area"):
-        t = convert_features_to_df(features=features, sample_names=names, quant_method=quant)
-        raw = t[["feature_ID"] + names]
-        raw.to_csv(os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_raw.tsv.gz"), sep="\t", index=False)
+    def normalise(t: pd.DataFrame, lowess: bool) -> pd.DataFrame:
         t = t.drop(columns=dropped)
-        if params.signal_normalization:
+        if lowess:
             t = signal_normalization(t, meta_n, params.signal_norm_method)
         if params.sample_normalization:
             t = sample_normalization(t, meta_n, params.sample_norm_method)
-        t[["feature_ID"] + list(meta_n.iloc[:, 0])].to_csv(
+        return t[["feature_ID"] + list(meta_n.iloc[:, 0])]
+
+    for quant in ("peak_height", "peak_area"):
+        t = convert_features_to_df(features=features, sample_names=names, quant_method=quant)
+        t[["feature_ID"] + names].to_csv(os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_raw.tsv.gz"), sep="\t", index=False)
+        normalise(t, params.signal_normalization).to_csv(
             os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_normalised.tsv.gz"), sep="\t", index=False)
+    # The drift sensitivity analysis needs heights normalised the other way
+    # (section 10); MassCube's LOWESS needs at least three QCs to run at all.
+    if int(meta_n["is_qc"].sum()) >= 3:
+        t = convert_features_to_df(features=features, sample_names=names, quant_method="peak_height")
+        normalise(t, not params.signal_normalization).to_csv(
+            os.path.join(out, f"{tag}_height_normalised_{'without' if params.signal_normalization else 'with'}_lowess.tsv.gz"),
+            sep="\t", index=False)
     print(f"{mode}: {len(features)} features annotated in {t_annot:.0f} s; level 2: {sum(v == 2 for v in levels.values())}, "
           f"level 3: {sum(v == 3 for v in levels.values())}; drug hits: {len(drug_rows)}; "
           f"LOWESS {'on' if params.signal_normalization else 'off'}")
