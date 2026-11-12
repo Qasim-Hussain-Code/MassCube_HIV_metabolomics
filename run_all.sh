@@ -70,6 +70,7 @@ for mode in pos neg; do
 done
 stage 07 "annotation and normalisation" bash "$ROOT/scripts/07_annotate.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 08 "injection QC, filters, positive control" bash "$ROOT/scripts/08_qc_filters.sh" "${FORCE[@]+"${FORCE[@]}"}"
+stage 09 "statistics" bash "$ROOT/scripts/lib/r_stage.sh" 09_statistics scripts/09_statistics.R "${FORCE[@]+"${FORCE[@]}"}"
 
 {
     printf "stage\telapsed_s\tpeak_rss_mb\tdisk_before_gb\tdisk_after_gb\tnote\n"

@@ -142,7 +142,27 @@ env_python_exe() {
     done
 }
 
+env_rscript_exe() {
+    local p
+    for p in "$ROOT/env/Scripts/Rscript.exe" "$ROOT/env/Lib/R/bin/Rscript.exe" "$ROOT/env/bin/Rscript"; do
+        if [[ -x "$p" ]]; then echo "$p"; return; fi
+    done
+}
+
 MEASURED_RSS="NA"
+run_r_measured() {
+    # run_r_measured <label> <script.R> [args...]: as run_python_measured,
+    # for an R script run by the environment's Rscript.
+    local label="$1"; shift
+    local rs rc=0
+    rs="$(env_rscript_exe)"
+    if [[ -z "$rs" ]]; then echo "no Rscript in env/; run scripts/01_install.sh" >&2; return 1; fi
+    "$ROOT/scripts/lib/in_env.sh" python "$ROOT/scripts/lib/measure.py" \
+        --label "$label" --log "$(native_path "$ROOT/logs/measure.tsv")" -- "$(native_path "$rs")" "$@" || rc=$?
+    MEASURED_RSS="$(awk -F'\t' -v l="$label" '$1 == l {v = $4} END {print (v == "" ? "NA" : v)}' "$ROOT/logs/measure.tsv")"
+    return $rc
+}
+
 run_python_measured() {
     # run_python_measured <label> <script> [args...]: run a Python script
     # from the environment under measure.py and leave its peak resident
