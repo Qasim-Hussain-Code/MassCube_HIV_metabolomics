@@ -7,6 +7,13 @@
 # scripts/lib/measure.py, which wraps the stage's heavy command; GNU
 # time does not exist on Windows, and conda-forge's time package has no
 # Windows build, so the measurement is done the same way everywhere.
+#
+# ShellCheck 0.11 reports SC2218 ("only defined later") for calls between
+# the functions below when this file is checked on its own, although each
+# is defined before any function that calls it and nothing is called while
+# the file loads; every stage that sources it checks clean. SC2034 is the
+# same situation for MEASURED_RSS, which only the sourcing stages read.
+# shellcheck disable=SC2218,SC2034
 
 ROOT="${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 CONF="$ROOT/project.conf"
