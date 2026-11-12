@@ -42,9 +42,9 @@ import psutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from disk_usage import tree_bytes  # noqa: E402
 from fetch import download, file_hash  # noqa: E402
+from mc_common import MODES, mode_params, native, read_conf  # noqa: E402
 
 BASE = "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS9264/FILES"
-MODES = {"pos": "positive", "neg": "negative"}
 MANIFEST_FIELDS = [
     "file", "mode", "subgroup", "raw_bytes", "raw_sha256", "mzml_bytes", "mzml_sha256",
     "ms1_scans", "ms2_scans", "all_centroid", "polarity", "instrument_model", "instrument_serial",
@@ -56,20 +56,6 @@ MANIFEST_FIELDS = [
 ]
 
 
-def read_conf(root: str) -> dict:
-    conf = {}
-    with open(os.path.join(root, "project.conf"), encoding="utf-8") as fh:
-        for line in fh:
-            m = re.match(r'^([A-Z_]+)=("?)(.*)\2\s*$', line.strip())
-            if m:
-                conf[m.group(1)] = m.group(3)
-    return conf
-
-
-def native(path: str) -> str:
-    # project.conf stores MSYS paths (/c/Users/...); Windows Python needs C:/Users/...
-    m = re.match(r"^/([a-zA-Z])/(.*)$", path)
-    return f"{m.group(1).upper()}:/{m.group(2)}" if (m and os.name == "nt") else path
 
 
 def check_space(root: str, conf: dict, incoming: int) -> None:
@@ -204,7 +190,6 @@ def main() -> None:
     ap.add_argument("--connections", type=int, default=8)
     a = ap.parse_args()
 
-    from masscube.params import Params
     from masscube.raw_data_utils import find_raw_data_info
     from masscube.utils_functions import get_start_time
     from masscube.workflows import process_single_file
@@ -225,26 +210,7 @@ def main() -> None:
     with open(os.path.join(root, "results", "mtbls9264_files.tsv"), encoding="utf-8") as fh:
         listing = {os.path.splitext(r["file"])[0]: r for r in csv.DictReader(fh, delimiter="\t")}
 
-    # Params as MassCube's _untargeted_metabolomics_workflow_preparation leaves them,
-    # minus the step that requires every raw file to be present in data/.
-    shutil.copyfile(os.path.join(root, "config", f"masscube_parameters_{a.mode}.csv"), os.path.join(work, "parameters.csv"))
-    params = Params()
-    params.project_dir = work
-    params.sample_dir = mzml_dir
-    params.single_file_dir = os.path.join(work, "single_files")
-    params.tmp_file_dir = os.path.join(work, "tmp")
-    params.ms2_matching_dir = os.path.join(work, "ms2_matching")
-    params.bpc_dir = os.path.join(work, "chromatograms")
-    params.project_file_dir = os.path.join(work, "project_files")
-    params.statistics_dir = os.path.join(work, "statistical_analysis")
-    params.normalization_dir = os.path.join(work, "normalization_results")
-    for d in (params.single_file_dir, params.tmp_file_dir, params.ms2_matching_dir, params.bpc_dir,
-              params.project_file_dir, params.statistics_dir, params.normalization_dir):
-        os.makedirs(d, exist_ok=True)
-    params.read_parameters_from_csv(os.path.join(work, "parameters.csv"))
-    params.output_single_file = True
-    params.output_ms1_scans = True
-    params.output_aligned_file = True
+    params = mode_params(root, a.mode)
 
     names = [r["sample_name"] for r in table]
     if a.pilot:
@@ -281,7 +247,10 @@ def main() -> None:
         t0 = time.monotonic()
         got = download(f"{BASE}/{raw_name}", raw, size=size, sha256=entry["sha256_published"], connections=a.connections)
         t_download = time.monotonic() - t0
-        print(f"{name}: {size / 1024**2:.0f} MB downloaded in {t_download:.0f} s, sha256 verified")
+        # A raw file already on disk from an interrupted run is only re-verified;
+        # its time is not a download time and is recorded as NA.
+        verb = "already present" if got.get("resumed") else f"downloaded in {t_download:.0f} s"
+        print(f"{name}: {size / 1024**2:.0f} MB {verb}, sha256 verified")
 
         t0 = time.monotonic()
         cmd = [trfp, "-i", raw, "-o", mzml_dir, "-f", "1", "-m", "0", "-z", "-l", "3"]
@@ -342,7 +311,7 @@ def main() -> None:
             # Kept to show what MassCube itself reads from the same header (None for these files).
             "masscube_ms_type": ms_type, "masscube_ion_mode": mc_mode, "masscube_start_time": mc_start.isoformat() if mc_start else "None",
             "features": n_features, "single_file_bytes": os.path.getsize(txt), "mzpkl_bytes": os.path.getsize(mzpkl),
-            "download_s": f"{t_download:.0f}", "convert_s": f"{t_convert:.0f}", "masscube_s": f"{t_masscube:.0f}",
+            "download_s": "NA" if got.get("resumed") else f"{t_download:.0f}", "convert_s": f"{t_convert:.0f}", "masscube_s": f"{t_masscube:.0f}",
             "rss_after_mb": f"{me.memory_info().rss / 1024**2:.0f}",
             "peak_rss_so_far_mb": f"{getattr(me.memory_info(), 'peak_wset', me.memory_info().rss) / 1024**2:.0f}",
             "project_bytes_after": "", "processed": datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%S%z"),
