@@ -157,7 +157,10 @@ run_python_measured() {
         any_python "$@"
         return
     fi
+    local rc=0
     "$ROOT/scripts/lib/in_env.sh" python "$ROOT/scripts/lib/measure.py" \
-        --label "$label" --log "$(native_path "$ROOT/logs/measure.tsv")" -- "$(native_path "$py")" "$@"
+        --label "$label" --log "$(native_path "$ROOT/logs/measure.tsv")" -- "$(native_path "$py")" "$@" || rc=$?
     MEASURED_RSS="$(awk -F'\t' -v l="$label" '$1 == l {v = $4} END {print (v == "" ? "NA" : v)}' "$ROOT/logs/measure.tsv")"
+    # The script's own exit status, so a caller can act on a specific code.
+    return $rc
 }

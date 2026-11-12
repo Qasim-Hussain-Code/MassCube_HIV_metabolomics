@@ -40,6 +40,12 @@ done
 case "$MODE" in pos|neg) ;; *) echo "04_process_mode: --mode pos or --mode neg is required" >&2; exit 2 ;; esac
 
 if [[ $PILOT -eq 1 ]]; then STAGE="04_pilot_$MODE"; else STAGE="04_process_$MODE"; fi
+# The full mode runs with the tolerances the pilot rules settled
+# (preregistration.md, section 7), so it waits for them.
+if [[ $PILOT -eq 0 && $LIMIT -eq 0 && ! -f "$(stamp_file "05_rules_$MODE")" ]]; then
+    echo "04_process_mode: the pilot rules for $MODE have not been applied; run scripts/05_pilot_rules.sh --mode $MODE first" >&2
+    exit 1
+fi
 # A --limit run is a test, not the stage, so it neither skips on nor writes the stamp.
 if [[ $LIMIT -eq 0 ]]; then stage_skip_if_done "$STAGE" "$FORCE"; fi
 stage_start "$STAGE"
