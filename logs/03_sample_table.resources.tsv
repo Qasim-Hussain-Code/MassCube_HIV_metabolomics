@@ -1,2 +1,2 @@
 stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
-03_sample_table	4	15	4.53	4.53	229 files across both modes	2026-11-09T17:47:34+0800
+03_sample_table	2	15	3.25	3.25	229 files across both modes	2026-11-12T10:22:29+0800
