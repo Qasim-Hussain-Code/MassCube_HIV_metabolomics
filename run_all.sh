@@ -71,6 +71,13 @@ done
 stage 07 "annotation and normalisation" bash "$ROOT/scripts/07_annotate.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 08 "injection QC, filters, positive control" bash "$ROOT/scripts/08_qc_filters.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 09 "statistics" bash "$ROOT/scripts/lib/r_stage.sh" 09_statistics scripts/09_statistics.R "${FORCE[@]+"${FORCE[@]}"}"
+# Exploratory analyses (preregistration.md, section 13)
+stage 10 "pathway over-representation" bash "$ROOT/scripts/lib/py_stage.sh" 10_pathways scripts/lib/pathways.py "${FORCE[@]+"${FORCE[@]}"}"
+stage 10 "classifier" bash "$ROOT/scripts/lib/py_stage.sh" 10_classifier scripts/lib/classifier.py "${FORCE[@]+"${FORCE[@]}"}"
+stage 10 "PERMANOVA" bash "$ROOT/scripts/lib/r_stage.sh" 10_permanova scripts/10_permanova.R "${FORCE[@]+"${FORCE[@]}"}"
+# The replication table reads the pathway result, so it comes after stage 10.
+stage 11 "published claims" bash "$ROOT/scripts/lib/r_stage.sh" 11_replication scripts/11_replication.R "${FORCE[@]+"${FORCE[@]}"}"
+stage 12 "figures" bash "$ROOT/scripts/lib/r_stage.sh" 12_figures scripts/12_figures.R "${FORCE[@]+"${FORCE[@]}"}"
 
 {
     printf "stage\telapsed_s\tpeak_rss_mb\tdisk_before_gb\tdisk_after_gb\tnote\n"
