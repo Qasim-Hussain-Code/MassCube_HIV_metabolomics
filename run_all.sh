@@ -68,6 +68,7 @@ for mode in pos neg; do
     stage 05 "$mode mode, all files" bash "$ROOT/scripts/04_process_mode.sh" --mode "$mode" "${FORCE[@]+"${FORCE[@]}"}"
     stage 06 "$mode mode, alignment" bash "$ROOT/scripts/06_align_mode.sh" --mode "$mode" "${FORCE[@]+"${FORCE[@]}"}"
 done
+stage 07 "annotation and normalisation" bash "$ROOT/scripts/07_annotate.sh" "${FORCE[@]+"${FORCE[@]}"}"
 
 {
     printf "stage\telapsed_s\tpeak_rss_mb\tdisk_before_gb\tdisk_after_gb\tnote\n"
