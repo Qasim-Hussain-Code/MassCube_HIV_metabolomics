@@ -71,6 +71,11 @@ done
 stage 07 "annotation and normalisation" bash "$ROOT/scripts/07_annotate.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 08 "injection QC, filters, positive control" bash "$ROOT/scripts/08_qc_filters.sh" "${FORCE[@]+"${FORCE[@]}"}"
 stage 09 "statistics" bash "$ROOT/scripts/lib/r_stage.sh" 09_statistics scripts/09_statistics.R "${FORCE[@]+"${FORCE[@]}"}"
+# Exploratory analyses (preregistration.md, section 12)
+stage 10 "pathway over-representation" bash "$ROOT/scripts/lib/py_stage.sh" 10_pathways scripts/lib/pathways.py "${FORCE[@]+"${FORCE[@]}"}"
+stage 10 "classifier" bash "$ROOT/scripts/lib/py_stage.sh" 10_classifier scripts/lib/classifier.py "${FORCE[@]+"${FORCE[@]}"}"
+stage 10 "PERMANOVA" bash "$ROOT/scripts/lib/r_stage.sh" 10_permanova scripts/10_permanova.R "${FORCE[@]+"${FORCE[@]}"}"
+stage 11 "figures" bash "$ROOT/scripts/lib/r_stage.sh" 11_figures scripts/11_figures.R "${FORCE[@]+"${FORCE[@]}"}"
 
 {
     printf "stage\telapsed_s\tpeak_rss_mb\tdisk_before_gb\tdisk_after_gb\tnote\n"
