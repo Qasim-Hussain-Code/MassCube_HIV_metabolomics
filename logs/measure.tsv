@@ -7,3 +7,4 @@ label	started	elapsed_s	peak_rss_mb	exit_code
 04_pilot_pos	2026-11-09T19:25:41+0800	189.1	914	0
 04_pilot_pos	2026-11-12T09:09:49+0800	126.7	855	0
 05_rules_pos	2026-11-12T09:13:07+0800	1.6	70	1
+03_sample_table	2026-11-12T10:22:27+0800	0.1	15	0
