@@ -19,10 +19,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] statmod_1.5.2       jsonlite_2.0.0      patchwork_1.3.2    
- [4] ggrepel_0.9.8       ggplot2_4.0.3       data.table_1.18.6.1
- [7] vegan_2.7-6         permute_0.10-0      ropls_1.44.0       
-[10] limma_3.68.5       
+ [1] R.utils_2.13.0      R.oo_1.27.1         R.methodsS3_1.8.2  
+ [4] statmod_1.5.2       jsonlite_2.0.0      patchwork_1.3.2    
+ [7] ggrepel_0.9.8       ggplot2_4.0.3       data.table_1.18.6.1
+[10] vegan_2.7-6         permute_0.10-0      ropls_1.44.0       
+[13] limma_3.68.5       
 
 loaded via a namespace (and not attached):
  [1] generics_0.1.4              SparseArray_1.12.3         

@@ -9,8 +9,9 @@ args <- commandArgs(trailingOnly = TRUE)
 out_tsv <- args[1]
 out_session <- args[2]
 
+## R.utils lets data.table read and write the gzipped result tables.
 pkgs <- c("limma", "ropls", "vegan", "data.table", "ggplot2", "ggrepel",
-          "patchwork", "jsonlite", "statmod")
+          "patchwork", "jsonlite", "statmod", "R.utils")
 
 repos <- "https://cloud.r-project.org"
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager", repos = repos)
