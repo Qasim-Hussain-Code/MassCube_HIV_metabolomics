@@ -75,6 +75,8 @@ def main() -> None:
     os.makedirs(out, exist_ok=True)
 
     from masscube.alignment import convert_features_to_df, feature_alignment, output_feature_table
+    from masscube.feature_grouping import group_features_after_alignment
+    from masscube.utils_functions import convert_signals_to_string
 
     table = pd.read_csv(os.path.join(root, "config", f"sample_table_{tag}.csv"), dtype=str)
     meta = run_order(root, tag)
@@ -150,6 +152,21 @@ def main() -> None:
     ft = convert_features_to_df(features=features, sample_names=params.sample_metadata.iloc[:, 0], quant_method=params.quant_method)
     output_feature_table(ft, os.path.join(params.project_file_dir, "aligned_feature_table_before_annotation.txt"))
 
+    # 4b. Feature grouping (isotopes, adducts, in-source fragments). MassCube
+    # runs it after annotation, but it reads each feature's reference file
+    # from the .mzpkl caches and silently leaves a feature ungrouped when the
+    # cache is gone. The caches cannot be kept until the database is on disk
+    # (preregistration.md, section 15), so grouping runs here, before the
+    # clean-up; an adduct a library match would have supplied is therefore
+    # MassCube's default for the mode. Recorded as a deviation in the README.
+    t0 = time.monotonic()
+    group_features_after_alignment(features, params)
+    for f in features:
+        f.isotope_signals = convert_signals_to_string(f.isotope_signals)
+    t_group = time.monotonic() - t0
+    with open(os.path.join(params.project_file_dir, "aligned_features_grouped.pkl"), "wb") as fh:
+        pickle.dump(features, fh)
+
     # 5. Per-injection metrics, while the per-file tables are still plain text
     rows = []
     for n in meta["sample_name"]:
@@ -174,9 +191,13 @@ def main() -> None:
                 os.remove(txt)
     after_bytes = tree_bytes(root)
     n_detected = np.array([np.sum(f.feature_id_arr != -1) for f in features])
+    groups = pd.Series([f.feature_group_id for f in features])
     pd.DataFrame([{"mode": mode, "files": len(meta), "aligned_features": len(features),
+                   "feature_groups": int(groups.nunique()),
+                   "isotopes": int(sum(f.is_isotope for f in features)),
+                   "in_source_fragments": int(sum(f.is_in_source_fragment for f in features)),
                    "median_files_detected_before_gap_filling": float(np.median(n_detected)) if len(n_detected) else np.nan,
-                   "correct_rt": correct_rt, "align_s": round(t_align, 1),
+                   "correct_rt": correct_rt, "align_s": round(t_align, 1), "group_s": round(t_group, 1),
                    "project_gb_before_cleanup": round(before_bytes / 1024**3, 3),
                    "project_gb_after_cleanup": round(after_bytes / 1024**3, 3)}]).to_csv(
         os.path.join(out, f"{tag}_alignment_summary.tsv"), sep="\t", index=False)
