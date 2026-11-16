@@ -72,12 +72,18 @@ def main() -> int:
     widen = bool(p99 > LIMIT_DA) and current < WIDENED_DA
     decision = ("widen to 0.015 Da and reprocess the pilot" if widen
                 else "already widened" if current >= WIDENED_DA else "keep 0.01 Da")
-    pd.DataFrame([{
+    rule = pd.DataFrame([{
         "mode": mode, "pilot_files": len(have), "reference_file": ref, "reference_features": 200,
         "matched_in_all_files": int(spread.size), "mz_range_median_da": float(spread.median()) if len(spread) else np.nan,
         "mz_range_p99_da": p99, "limit_da": LIMIT_DA, "mz_tol_ms1_before": current,
         "mz_tol_alignment_before": float(params["mz_tol_alignment"]), "decision": decision,
-    }]).to_csv(os.path.join(out_dir, f"{tag}_mz_rule.tsv"), sep="\t", index=False)
+        "evaluated": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }])
+    # A widened mode runs the rule twice; the first row is the decision itself, so append, don't overwrite
+    path = os.path.join(out_dir, f"{tag}_mz_rule.tsv")
+    if os.path.exists(path) and not a.test:
+        rule = pd.concat([pd.read_csv(path, sep="\t"), rule], ignore_index=True)
+    rule.to_csv(path, sep="\t", index=False)
 
     rows = []
     for n in have:
