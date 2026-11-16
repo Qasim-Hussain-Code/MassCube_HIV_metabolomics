@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Set the GitHub description and topics once the repository has a remote.
-# Not run by the pipeline; run it after `git push`.
-#
-# Usage: scripts/lib/set_github_metadata.sh [owner/repo]
+# GitHub description and topics. Run by hand after a push, not by run_all.sh.
 set -euo pipefail
 REPO="${1:-}"
 ARGS=()

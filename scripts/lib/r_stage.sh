@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# Run one R stage with the same bookkeeping as the shell stages: skip when
-# its stamp exists, measure elapsed time, peak resident memory and disk,
-# and write logs/<stage>.resources.tsv and the stamp.
-#
-# Usage: scripts/lib/r_stage.sh <stage> <script.R> [--force]
+# r_stage.sh <stage> <script.R> [--force]: same as py_stage.sh, for R
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 # shellcheck source=common.sh

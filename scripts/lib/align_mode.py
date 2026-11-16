@@ -1,32 +1,6 @@
-"""Align one ion mode with MassCube, after every file has been processed.
-
-In order, following preregistration.md sections 4 to 7:
-
-1. Run order. Files are ordered by the acquisition times in the conversion
-   manifest and numbered; MassCube's label_batch_id splits batches;
-   conditioning QCs are flagged. Written to results/<mode>_run_order.tsv
-   and into the injection_order and batch columns of the sample table.
-2. Retention time rule. Across the non-conditioning QCs, the 200 most
-   intense features of the median QC are matched in every other QC; if the
-   median per-feature retention time range exceeds 0.05 min, MassCube's
-   correct_rt is switched on for the mode.
-3. Drift rule. LOWESS drift correction is switched on only if at least 8
-   non-conditioning QCs remain, one comes before the first study sample
-   and one after the last, and no run of more than 20 consecutive study
-   injections lacks a QC. It is applied later, with normalisation.
-4. MassCube's feature_alignment, with its gap filling reading the .mzpkl
-   scan caches. The aligned features are pickled and exported as the
-   workflow does before annotation.
-5. Per-injection metrics from the per-file tables (feature count, summed
-   and maximum height, internal standard), before those are compressed.
-6. Clean-up: the .mzpkl caches are deleted and the per-file tables gzipped,
-   so that the next mode fits on disk.
-
-Usage: python align_mode.py --root ROOT --mode pos|neg [--test]
-
---test aligns whatever files are processed, writes to work/<mode>/test/,
-and leaves config/, the caches and the per-file tables untouched.
-"""
+#!/usr/bin/env python3
+# One mode, all files processed: run order, RT and drift rules (prereg 5 to 7), MassCube alignment, then clean-up.
+# --test aligns whatever is there into work/<mode>/test/ and touches nothing else.
 
 from __future__ import annotations
 
@@ -52,7 +26,6 @@ DRIFT_MAX_GAP = 20
 
 
 def longest_gap(meta: pd.DataFrame, qc: pd.Series) -> int:
-    """Longest run of consecutive study injections with no usable QC."""
     run = best = 0
     for is_study, is_qc in zip(~meta["is_qc"] & ~meta["is_blank"], qc):
         if is_qc:
@@ -86,7 +59,7 @@ def main() -> None:
     if missing and not a.test:
         sys.exit(f"{mode}: {len(missing)} of {len(table)} files not processed yet ({', '.join(missing[:8])}...)")
 
-    # 1. Run order
+    # run order goes back into the sample table too
     man = read_manifest(root, mode).set_index("sample_name")
     order = pd.DataFrame({
         "injection_order": meta["analytical_order"] + 1,
@@ -103,7 +76,7 @@ def main() -> None:
         table["batch"] = [str(pos.loc[n, "batch_id"]) for n in table["sample_name"]]
         table.to_csv(os.path.join(root, "config", f"sample_table_{tag}.csv"), index=False, lineterminator="\n")
 
-    # 2. Retention time rule, on the non-conditioning QCs
+    # correct_rt on if the median RT range across QCs > 0.05 min
     qc_names = list(meta.loc[meta["is_qc"] & ~meta["conditioning_qc"], "sample_name"])
     tables = {n: read_single(os.path.join(single, n + ".txt")) for n in meta["sample_name"]}
     if len(qc_names) >= 2:
@@ -117,7 +90,7 @@ def main() -> None:
                    "rt_range_median_min": rt_median, "rt_range_p95_min": float(rt_range.quantile(0.95)) if len(rt_range) else np.nan,
                    "limit_min": RT_LIMIT_MIN, "correct_rt": correct_rt}]).to_csv(os.path.join(out, f"{tag}_rt_rule.tsv"), sep="\t", index=False)
 
-    # 3. Drift rule
+    # LOWESS only with >= 8 usable QCs, a QC either side of the study samples, and no stretch of > 20 samples without one
     usable_qc = meta["is_qc"] & ~meta["conditioning_qc"]
     study_idx = meta.index[~meta["is_qc"] & ~meta["is_blank"]]
     qc_idx = meta.index[usable_qc]
@@ -132,7 +105,6 @@ def main() -> None:
         set_parameter(root, tag, "correct_rt", "true" if correct_rt else "false")
         set_parameter(root, tag, "signal_normalization", "true" if drift else "false")
 
-    # 4. Alignment, with MassCube's own functions and Params
     params = mode_params(root, tag)
     if a.test:
         params.correct_rt = correct_rt
@@ -152,13 +124,9 @@ def main() -> None:
     ft = convert_features_to_df(features=features, sample_names=params.sample_metadata.iloc[:, 0], quant_method=params.quant_method)
     output_feature_table(ft, os.path.join(params.project_file_dir, "aligned_feature_table_before_annotation.txt"))
 
-    # 4b. Feature grouping (isotopes, adducts, in-source fragments). MassCube
-    # runs it after annotation, but it reads each feature's reference file
-    # from the .mzpkl caches and silently leaves a feature ungrouped when the
-    # cache is gone. The caches cannot be kept until the database is on disk
-    # (preregistration.md, section 14), so grouping runs here, before the
-    # clean-up; an adduct a library match would have supplied is therefore
-    # MassCube's default for the mode. Recorded as a deviation in the README.
+    # Grouping before annotation, unlike MassCube: it reads the .mzpkl caches and quietly
+    # leaves features ungrouped without them, and the caches have to go before the
+    # database comes down. So a library adduct can't feed in here (deviation 2).
     t0 = time.monotonic()
     group_features_after_alignment(features, params)
     for f in features:
@@ -167,7 +135,6 @@ def main() -> None:
     with open(os.path.join(params.project_file_dir, "aligned_features_grouped.pkl"), "wb") as fh:
         pickle.dump(features, fh)
 
-    # 5. Per-injection metrics, while the per-file tables are still plain text
     rows = []
     for n in meta["sample_name"]:
         t = tables[n]
@@ -177,7 +144,7 @@ def main() -> None:
                      **internal_standard(t, mode)})
     pd.DataFrame(rows).to_csv(os.path.join(out, f"{tag}_injection_metrics.tsv"), sep="\t", index=False)
 
-    # 6. Clean-up, so that the other mode fits
+    # caches out, tables gzipped (~28 MB to ~10 each), or the other mode won't fit
     before_bytes = tree_bytes(root)
     if not a.test:
         for n in meta["sample_name"]:

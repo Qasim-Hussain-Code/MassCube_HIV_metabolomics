@@ -1,19 +1,6 @@
-"""Download a file from MetaboLights or Zenodo, resumably, and verify it.
-
-The links this was written on are slow and drop connections (EBI served
-3 to 16 KB/s per connection on the build machine), so every download:
-
-- is split into byte ranges fetched over several connections at once,
-  each range kept in its own .partN file so an interrupted run resumes
-  where each range stopped;
-- is retried with backoff on any network error;
-- is checked against the expected size and the published checksum
-  before it is moved to its final name. A file that fails the checksum
-  is deleted, never kept.
-
-Standard library only, so the metadata stage can run before the conda
-environment exists.
-"""
+# Resumable range downloads. EBI gave 3 to 16 KB/s per connection from here, so files go
+# over several connections, each range in its own .partN, and nothing is kept that fails its checksum.
+# stdlib only: 02 runs before env/ exists.
 
 from __future__ import annotations
 
@@ -34,7 +21,6 @@ def _request(url: str, method: str = "GET", headers: dict | None = None):
 
 
 def remote_size(url: str, tries: int = 6) -> tuple[int, str]:
-    """Content-Length and Last-Modified from a HEAD request."""
     last = None
     for i in range(tries):
         try:
@@ -85,7 +71,6 @@ def file_hash(path: str, algorithm: str = "sha256") -> str:
 
 def download(url: str, dest: str, size: int | None = None, sha256: str | None = None,
              md5: str | None = None, connections: int = 4, tries: int = 30) -> dict:
-    """Fetch url to dest. Returns size, checksum and elapsed seconds."""
     if os.path.exists(dest):
         got = file_hash(dest, "sha256" if sha256 else "md5") if (sha256 or md5) else None
         if got is None or got == (sha256 or md5):
@@ -94,7 +79,6 @@ def download(url: str, dest: str, size: int | None = None, sha256: str | None = 
     if size is None:
         size, _ = remote_size(url)
     t0 = time.monotonic()
-    # Small files are not worth splitting.
     n = 1 if size < (8 << 20) else max(1, connections)
     bounds = [(k * size // n, (k + 1) * size // n - 1) for k in range(n)]
     parts = [f"{dest}.part{k}" for k in range(n)]

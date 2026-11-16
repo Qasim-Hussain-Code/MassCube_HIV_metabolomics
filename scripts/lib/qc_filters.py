@@ -1,24 +1,6 @@
-"""Injection QC, run order, feature filters, the positive control and PCA.
-
-preregistration.md, sections 5, 6, 8 and 9, applied to the tables the
-annotation stage wrote. Nothing here compares the two groups' feature
-values; that is the statistics stage's job.
-
-Writes, all to results/:
-  injection_qc.tsv                one row per injection, both modes, with the exclusion verdict
-  run_order_test.tsv              injection order of PLWH against HC, per mode
-  <mode>_filter_log.tsv           each filter with its threshold, the number removed and why
-  <mode>_feature_qc.tsv.gz        per feature: detection by group, QC detection, RSD, D-ratio, flags
-  <mode>_representatives.tsv      the feature tested for each MassCube feature group
-  antiretroviral_control.tsv      detection of each drug by group; in positive mode also the counts
-                                  under the Sample Name link that section 3 rejected
-  antiretroviral_control_verdict.tsv  whether the control passes, by the rule of section 9
-  <mode>_pca.tsv, <mode>_pca_order.tsv
-  <mode>_samples.tsv              study samples with group, order and inclusion
-  <mode>_matrix_<variant>.tsv.gz  log2 values of the representatives for each analysis variant
-
-Usage: python qc_filters.py --root ROOT
-"""
+#!/usr/bin/env python3
+# Injection QC, run-order test, feature filters, antiretroviral control, PCA (prereg 5, 6, 8, 9).
+# No group comparison of feature values here; that waits for 09.
 
 from __future__ import annotations
 
@@ -34,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from build_sample_tables import read_isa  # noqa: E402
 from mc_common import MODES  # noqa: E402
 
+# Broadhurst 2018 thresholds, as pre-registered
 DETECT_GROUP = 0.5
 DETECT_QC = 0.7
 RSD_MAX = 0.30
@@ -42,7 +25,7 @@ DRATIO_MAX = 0.50
 
 
 def injection_verdicts(res: str, tag: str) -> pd.DataFrame:
-    """Section 6: each criterion computed within the mode."""
+    # within the mode; "median / 3" is MassCube's own bad-injection test, borrowed for the other two
     m = pd.read_csv(os.path.join(res, f"{tag}_injection_metrics.tsv"), sep="\t")
     m["mode"] = MODES[tag]
     third = lambda c: m[c] < m[c].median() / 3
@@ -51,8 +34,7 @@ def injection_verdicts(res: str, tag: str) -> pd.DataFrame:
     m["low_summed_height"] = third("summed_height")
     m["truncated_run"] = m["last_scan_min"] < 0.9 * m["last_scan_min"].median()
     is_rate = m["is_detected"].astype(bool).mean()
-    # Dropped for the mode when the standard is found in under 90 per cent of
-    # files, since it would then measure the standard rather than the injection.
+    # if the standard itself turns up in < 90% of files, missing it says nothing about the injection
     m["internal_standard_used"] = is_rate >= 0.9
     m["internal_standard_missing"] = (~m["is_detected"].astype(bool)) & m["internal_standard_used"]
     crit = ["masscube_check", "low_feature_count", "low_summed_height", "truncated_run", "internal_standard_missing"]
@@ -74,7 +56,7 @@ def log2_na(a: np.ndarray) -> np.ndarray:
 
 def filter_mode(res: str, tag: str, samples: pd.DataFrame, qcs: list[str], height: pd.DataFrame,
                 detected: pd.DataFrame, rsd_max: float) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Sections 8.1 to 8.4, in order. Returns the per-feature table and the log."""
+    # prereg 8.1 to 8.4, in that order; the log keeps the reason for each step
     hc = list(samples.loc[samples["group"] == "HC", "sample_name"])
     plwh = list(samples.loc[samples["group"] == "PLWH", "sample_name"])
     study = hc + plwh
@@ -116,7 +98,7 @@ def filter_mode(res: str, tag: str, samples: pd.DataFrame, qcs: list[str], heigh
 
 
 def representatives(ann: pd.DataFrame, q: pd.DataFrame, height: pd.DataFrame, study: list[str]) -> pd.DataFrame:
-    """One feature per MassCube feature group (section 8)."""
+    # one per MassCube group, the tallest by median height; ungrouped features stand alone
     a = ann.merge(q[["feature_ID", "passes"]], on="feature_ID")
     a = a[a["passes"] & ~a["is_isotope"].astype(bool) & ~a["is_in_source_fragment"].astype(bool)].copy()
     med = height.set_index("feature_ID")[study].replace(0, np.nan).median(axis=1)
@@ -168,9 +150,7 @@ def main() -> None:
         log.to_csv(os.path.join(res, f"{tag}_filter_log.tsv"), sep="\t", index=False)
         q20, _ = filter_mode(res, tag, inc, usable_qc, height, detected, RSD_SENSITIVITY)
         q["passes_rsd20"] = q20["passes"].to_numpy()
-        # A feature is drug-derived when its main-database match is one of the
-        # antiretrovirals, or when the GNPS drug spectra matched it; it then
-        # carries the level of that drug match, not of the main annotation.
+        # drug-derived = main-database hit on an antiretroviral, or a GNPS drug match (then with that match's level)
         hits = pd.read_csv(os.path.join(res, f"{tag}_drug_hits.tsv"), sep="\t").set_index("feature_ID")
         drug_by_db = ann["InChIKey"].astype(str).str.split("-").str[0].map(drug_first)
         by_lib = ann["feature_ID"].map(hits["drug"]) if len(hits) else pd.Series(np.nan, index=ann.index)
@@ -199,7 +179,8 @@ def main() -> None:
         for name, (tab, r, cols) in variants.items():
             matrix(tab, r["feature_ID"], cols).to_csv(os.path.join(res, f"{tag}_matrix_{name}.tsv.gz"), sep="\t", index=False)
 
-        # Positive control, section 9: detection before gap filling, by group.
+        # Positive control, before gap filling. For positive mode the counts under the rejected
+        # Sample Name link go alongside: if the drugs land in HC that way, the link really was wrong.
         det = detected.set_index("feature_ID")
         drug_feats = ann[ann["drug"].notna() & (ann["drug_level"] <= 3)]
         for drug, g in drug_feats.groupby("drug"):
@@ -221,7 +202,7 @@ def main() -> None:
                 control[-1]["plwh_detected_sample_name_link"] = int(sum(hit[c] for c in cols if grp(c) == "PLWH"))
                 control[-1]["hc_detected_sample_name_link"] = int(sum(hit[c] for c in cols if grp(c) == "HC"))
 
-        # PCA on log2, autoscaled data with QCs, features complete across the included injections.
+        # PCA with the QCs, complete features only (no imputation for a picture)
         cols = usable_qc + inc_study
         x = log2_na(height.set_index("feature_ID").loc[rep["feature_ID"], cols].to_numpy()).T
         x = x[:, np.all(np.isfinite(x), axis=0)]

@@ -1,12 +1,5 @@
-"""Resolve every DOI the README cites through Crossref, and its PMID through
-Europe PMC, and record what each service returned with the date.
-
-Writes results/doi_check.tsv: doi, resolved, title, the first eight authors,
-volume, issue, pages and year from Crossref,
-pmid from Europe PMC (blank when Europe PMC has none), and the date.
-
-Usage: python check_dois.py --root ROOT
-"""
+#!/usr/bin/env python3
+# Every README DOI through Crossref, its PMID through Europe PMC -> results/doi_check.tsv
 
 from __future__ import annotations
 
@@ -42,7 +35,7 @@ def main() -> None:
     ap.add_argument("--root", required=True)
     a = ap.parse_args()
     text = open(os.path.join(a.root, "README.md"), encoding="utf-8").read()
-    # A DOI in the README is written "doi 10.xxxx/..." or "DOI 10.xxxx/...".
+    # README writes them as "DOI 10.xxxx/..."
     dois = sorted(set(d.rstrip(".,;)") for d in re.findall(r"\b[Dd][Oo][Ii] (10\.\d{4,9}/\S+)", text)))
     today = datetime.date.today().isoformat()
     rows = []

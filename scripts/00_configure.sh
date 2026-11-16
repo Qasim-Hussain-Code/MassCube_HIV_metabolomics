@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
-# Detect or accept the machine's threads, RAM and disk budget and write
-# project.conf at the repository root. Every later stage sources that
-# file, so the same scripts run on another machine without edits.
-#
-# Usage:
-#   scripts/00_configure.sh [--threads N] [--ram GB] [--disk GB] [--yes] [--force] [--help]
-#
-# --disk is the ceiling for everything the project writes, environment
-# and caches included; stages stop 0.5 GB below it. Without --yes the
-# detected values are shown and must be confirmed. An existing
-# project.conf is kept unless values or --force are given.
-
+# Writes project.conf (threads, RAM, disk budget) for this machine; every later stage sources it.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -28,7 +17,7 @@ while [[ $# -gt 0 ]]; do
         --disk)    DISK_GB="$2"; shift 2 ;;
         --yes)     YES=1; shift ;;
         --force)   FORCE=1; shift ;;
-        --help|-h) sed -n '2,12p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/00_configure.sh [--threads N] [--ram GB] [--disk GB] [--yes] [--force]"; exit 0 ;;
         *) echo "unknown argument: $1" >&2; exit 2 ;;
     esac
 done
@@ -74,8 +63,8 @@ if (( DISK_GB > DET_DISK )); then
     exit 1
 fi
 
-# Peak resident memory is planned against 14 GB on a 16 GB machine and
-# proportionally below that elsewhere; installed RAM is not free RAM.
+# 2 GB below installed RAM (14 on this 16 GB machine); installed isn't free.
+# --disk covers env/ and caches too, and stages stop 0.5 GB short of it.
 PLAN_RAM_GB="$(awk -v r="$RAM_GB" 'BEGIN {v = r - 2; if (v < 2) v = 2; printf "%d", v}')"
 DISK_CEILING_GB="$(awk -v d="$DISK_GB" 'BEGIN {printf "%.1f", d - 0.5}')"
 

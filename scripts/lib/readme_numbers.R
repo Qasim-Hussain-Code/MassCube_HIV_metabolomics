@@ -1,8 +1,5 @@
-## Print the numbers the README quotes, each from the results file that
-## holds it, so that a reader can regenerate them and check the README
-## against them.
-##
-## Usage: scripts/lib/in_env.sh Rscript scripts/lib/readme_numbers.R
+#!/usr/bin/env Rscript
+## prints every table the README takes a number from, to check the README against
 
 suppressPackageStartupMessages(library("data.table"))
 root <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE))), "..", ".."), winslash = "/")

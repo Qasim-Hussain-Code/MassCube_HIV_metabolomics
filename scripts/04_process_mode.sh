@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
-# Download, convert and process one ion mode with MassCube, one raw file
-# at a time, so that no more than one raw file and one mzML exist at once.
-#
-# Usage: scripts/04_process_mode.sh --mode pos|neg [--pilot] [--limit N] [--connections K] [--force] [--help]
-#
-#   --pilot          only the six pilot files (preregistration.md, section 15)
-#   --limit N        stop after N newly processed files
-#   --connections K  parallel range requests per download (default 8)
-#
-# Each file's raw sha256 is checked against the value MetaboLights
-# publishes, and each mzML is checked for scan counts, centroid flags,
-# polarity, instrument and acquisition time before MassCube reads it. A
-# failed check stops the stage. Files already processed are skipped, so
-# the stage resumes after an interruption. Writes work/<mode>/ (untracked)
-# and appends to results/conversion_manifest.tsv.
-
+# download -> mzML -> MassCube, one raw file at a time; resumes where it stopped
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -33,20 +18,19 @@ while [[ $# -gt 0 ]]; do
         --limit) LIMIT="$2"; shift 2 ;;
         --connections) CONNECTIONS="$2"; shift 2 ;;
         --force) FORCE=1; shift ;;
-        --help|-h) sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/04_process_mode.sh --mode pos|neg [--pilot] [--limit N] [--connections K] [--force]"; exit 0 ;;
         *) echo "unknown argument: $1" >&2; exit 2 ;;
     esac
 done
 case "$MODE" in pos|neg) ;; *) echo "04_process_mode: --mode pos or --mode neg is required" >&2; exit 2 ;; esac
 
 if [[ $PILOT -eq 1 ]]; then STAGE="04_pilot_$MODE"; else STAGE="04_process_$MODE"; fi
-# The full mode runs with the tolerances the pilot rules settled
-# (preregistration.md, section 7), so it waits for them.
+# the full mode needs the tolerances the pilot settles (prereg section 7)
 if [[ $PILOT -eq 0 && $LIMIT -eq 0 && ! -f "$(stamp_file "05_rules_$MODE")" ]]; then
     echo "04_process_mode: the pilot rules for $MODE have not been applied; run scripts/05_pilot_rules.sh --mode $MODE first" >&2
     exit 1
 fi
-# A --limit run is a test, not the stage, so it neither skips on nor writes the stamp.
+# --limit is for testing: no stamp read or written
 if [[ $LIMIT -eq 0 ]]; then stage_skip_if_done "$STAGE" "$FORCE"; fi
 stage_start "$STAGE"
 

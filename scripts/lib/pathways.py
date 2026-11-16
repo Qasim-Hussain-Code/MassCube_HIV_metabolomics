@@ -1,28 +1,6 @@
-"""Pathway over-representation of the endogenous level 2 compounds.
-
-preregistration.md, section 12, after Wieder et al. 2021. Exploratory.
-
-The tested set is the endogenous level 2 compounds called at q < 0.05 by
-the primary test in either mode; the background is every endogenous
-level 2 compound that passed the filters, never the whole of KEGG.
-Compounds are de-duplicated across modes by InChIKey first block, keeping
-the feature with the lowest q. A pathway is tested only with at least 3
-background members; Fisher's exact test, one-sided for over-representation,
-with Benjamini-Hochberg across the pathways tested.
-
-KEGG compound identifiers: taken from PubChem's synonyms for the
-compound's InChIKey (KEGG deposits its C numbers there), then confirmed to
-exist in KEGG. Pathway membership comes from the KEGG REST API
-(link/compound/pathway, list/pathway/hsa). Both are cached in config/ with
-the retrieval date, and a cached value is used on reruns:
-  config/kegg_compound_ids.tsv, config/kegg_pathway_compounds.tsv, config/kegg_pathways.tsv
-
-Writes results/pathway_background.tsv, results/pathway_ora_hsa.tsv (human
-pathways) and results/pathway_ora_reference.tsv
-(all KEGG reference maps, the sensitivity analysis).
-
-Usage: python pathways.py --root ROOT
-"""
+#!/usr/bin/env python3
+# KEGG over-representation, exploratory (prereg 12, after Wieder et al. 2021). The background is the
+# endogenous level 2 compounds that passed the filters, never all of KEGG. KEGG lookups are cached in config/.
 
 from __future__ import annotations
 
@@ -76,7 +54,7 @@ def bh(p: np.ndarray) -> np.ndarray:
 
 
 def kegg_by_name(name: str) -> str:
-    """KEGG compound whose names include this one exactly, if exactly one does."""
+    # only when exactly one KEGG compound carries the name
     if not isinstance(name, str) or not name.strip():
         return ""
     txt = get(f"https://rest.kegg.jp/find/compound/{urllib.parse.quote(name.replace(',', ' '))}")
@@ -90,6 +68,7 @@ def kegg_ids(pairs: list[tuple[str, str]], cache_path: str) -> pd.DataFrame:
         pd.DataFrame(columns=["inchikey", "kegg_id", "source", "retrieved"])
     known = set(cache["inchikey"])
     today = datetime.date.today().isoformat()
+    # KEGG's conv/ maps PubChem SIDs, not CIDs, so the C numbers come from PubChem's synonyms (deviation 4)
     new = []
     for k, name in pairs:
         if k in known:
@@ -106,9 +85,7 @@ def kegg_ids(pairs: list[tuple[str, str]], cache_path: str) -> pd.DataFrame:
                 break
         source = "PubChem synonyms, confirmed in KEGG" if kid else ""
         if not kid:
-            # PubChem's synonyms are per CID, and a stereo variant can carry
-            # the KEGG number another CID holds; an exact name match in KEGG
-            # is the fallback.
+            # synonyms are per CID, and the C number can sit on a stereo variant's CID instead
             kid = kegg_by_name(name)
             source = "KEGG exact name match" if kid else "no KEGG identifier found"
         new.append({"inchikey": k, "kegg_id": kid, "source": source, "retrieved": today})
@@ -169,6 +146,7 @@ def main() -> None:
         lim["mode"] = mode
         parts.append(lim)
     comp = pd.concat(parts)
+    # one per InChIKey first block across both modes, lowest q kept
     comp["block"] = comp["InChIKey"].str.split("-").str[0]
     comp = comp.sort_values("q").groupby("block").head(1)
     pairs = list(comp[["InChIKey", "annotation"]].drop_duplicates("InChIKey").itertuples(index=False, name=None))
@@ -179,6 +157,7 @@ def main() -> None:
     comp[["block", "InChIKey", "annotation", "mode", "feature_ID", "logFC", "q", "significant", "kegg_id"]].to_csv(
         os.path.join(res, "pathway_background.tsv"), sep="\t", index=False)
     links, names = kegg_membership(root)
+    # human maps as the main result; all reference maps as the sensitivity version
     hsa_maps = set(names.loc[names["in_hsa"], "pathway"])
     ora(bg, links[links["pathway"].isin(hsa_maps)], names).to_csv(os.path.join(res, "pathway_ora_hsa.tsv"), sep="\t", index=False)
     ora(bg, links, names).to_csv(os.path.join(res, "pathway_ora_reference.tsv"), sep="\t", index=False)

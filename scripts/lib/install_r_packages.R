@@ -1,15 +1,11 @@
-## Install the R packages the statistics stages need and record what was
-## installed. Run by scripts/01_install.sh inside the conda R.
-##
-## Versions are taken from the Bioconductor release that matches this R
-## and recorded in config/r_packages.tsv, so a later rebuild reports its
-## own versions rather than claiming these.
+#!/usr/bin/env Rscript
+## called by 01_install.sh; records what got installed rather than pinning, so a rebuild reports its own versions
 
 args <- commandArgs(trailingOnly = TRUE)
 out_tsv <- args[1]
 out_session <- args[2]
 
-## R.utils lets data.table read and write the gzipped result tables.
+## R.utils because fread won't open .gz without it
 pkgs <- c("limma", "ropls", "vegan", "data.table", "ggplot2", "ggrepel",
           "patchwork", "jsonlite", "statmod", "R.utils")
 
@@ -20,8 +16,7 @@ cat("R:", R.version.string, "\nBioconductor:", bioc_version, "\n")
 
 missing <- setdiff(pkgs, rownames(installed.packages()))
 if (length(missing)) {
-    ## update = FALSE keeps a working stack working; binaries only, since
-    ## a conda R on Windows has no compiler to build from source.
+    ## binaries only: conda R on Windows has no compiler
     options(install.packages.compile.from.source = "never")
     BiocManager::install(missing, update = FALSE, ask = FALSE, type = if (.Platform$OS.type == "windows") "binary" else getOption("pkgType"))
 }
@@ -36,8 +31,7 @@ write.table(data.frame(package = ip[, "Package"], version = ip[, "Version"],
                        recorded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")),
             out_tsv, sep = "\t", quote = FALSE, row.names = FALSE)
 
-## Load everything now, so that a broken installation fails here and not
-## inside the statistics stage.
+## a broken install should fail here, not halfway through stage 09
 suppressPackageStartupMessages(for (p in pkgs) library(p, character.only = TRUE))
 writeLines(capture.output(sessionInfo()), out_session)
 cat("wrote", out_tsv, "and", out_session, "\n")

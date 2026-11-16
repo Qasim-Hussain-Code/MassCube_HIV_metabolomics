@@ -1,23 +1,5 @@
 #!/usr/bin/env bash
-# Build the software environment inside the project and record what was
-# installed.
-#
-# The conda environment goes to env/ and every cache (conda packages,
-# pip, R's downloads) to .cache/, all untracked, so that the disk budget
-# in project.conf measures them. An existing conda is used if one is on
-# PATH or in the usual places; otherwise Miniforge is installed into
-# miniforge/. ThermoRawFileParser 1.4.5 comes from its GitHub release on
-# Windows, where bioconda has no build, and from bioconda elsewhere. The
-# R packages are installed by BiocManager inside the conda R. Caches are
-# emptied at the end.
-#
-# Usage: scripts/01_install.sh [--force] [--help]
-#
-# Writes config/python_packages.tsv, config/r_packages.tsv,
-# config/environment.lock.yml, config/tool_versions.tsv,
-# logs/sessionInfo_install.txt, and on first retrieval the
-# ThermoRawFileParser checksum in config/external_checksums.tsv.
-
+# conda env in env/, ThermoRawFileParser, R packages; versions go to config/.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -29,7 +11,7 @@ FORCE=0
 for arg in "$@"; do
     case "$arg" in
         --force) FORCE=1 ;;
-        --help|-h) sed -n '2,20p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/01_install.sh [--force]"; exit 0 ;;
         *) echo "unknown argument: $arg" >&2; exit 2 ;;
     esac
 done
@@ -45,6 +27,7 @@ mkdir -p "$ROOT/logs" "$ROOT/.cache/tmp"
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) WINDOWS=1 ;; *) WINDOWS=0 ;; esac
 winpath() { if [[ $WINDOWS -eq 1 ]]; then cygpath -w "$1"; else echo "$1"; fi; }
 
+# caches inside the project so the disk budget sees them
 CONDA_PKGS_DIRS="$(winpath "$ROOT/.cache/conda_pkgs")"
 PIP_CACHE_DIR="$(winpath "$ROOT/.cache/pip")"
 export CONDA_PKGS_DIRS PIP_CACHE_DIR
@@ -82,8 +65,7 @@ fi
 echo "01_install: using $CONDA ($("$CONDA" --version 2>&1 | tr -d '\r'))" | tee -a "$LOG"
 
 if [[ ! -d "$ENV/conda-meta" ]]; then
-    # Room for the environment and its package cache together, until the
-    # cache is cleaned below; the measured size is in the resource log.
+    # env plus its package cache, until the cache is cleaned at the end
     require_space $((5 * 1024 * 1024 * 1024))
     echo "01_install: creating the environment in env/ (downloads about 1 GB)" | tee -a "$LOG"
     "$CONDA" env create -y -p "$(winpath "$ENV")" -f "$(winpath "$ROOT/config/environment.yml")" 2>&1 | tee -a "$LOG"
@@ -94,9 +76,8 @@ PY=("$ROOT/scripts/lib/in_env.sh" python)
 RS=("$ROOT/scripts/lib/in_env.sh" Rscript)
 "${PY[@]}" -c "import masscube, ms_entropy, psutil" 2>&1 | tee -a "$LOG"
 
-# ThermoRawFileParser. The 1.4.5 zip on GitHub publishes no checksum, so
-# the sha256 seen at first retrieval is recorded and every later
-# retrieval is checked against it.
+# No bioconda build on Windows, so the GitHub zip. It ships without a checksum:
+# the first download's sha256 is recorded and later downloads must match it.
 CHECKSUMS="$ROOT/config/external_checksums.tsv"
 [[ -f "$CHECKSUMS" ]] || printf "file\tsha256\tsize\tsource\trecorded\n" > "$CHECKSUMS"
 if [[ $WINDOWS -eq 1 ]]; then
@@ -136,11 +117,8 @@ R_VERSION="$("${RS[@]}" -e 'cat(R.version.string)' 2>/dev/null | tr -d '\r')"
 
 "${PY[@]}" "$ROOT/scripts/lib/record_versions.py" --root "$(winpath "$ROOT")" \
     --trfp-version "$TRFP_VERSION" --trfp-source "$TRFP_SOURCE" --trfp-sha256 "$TRFP_SHA" --r-version "$R_VERSION" 2>&1 | tee -a "$LOG"
-# The lock file names exact builds. Every conda package here comes from
-# conda-forge, but conda lists the channels of the local configuration
-# (on the build machine that added "defaults"), so the export is pinned to
-# conda-forge; the name and prefix lines would otherwise be paths on the
-# build machine.
+# Everything came from conda-forge, but the export would list "defaults" from
+# the local condarc, and name/prefix would be paths on this machine.
 "$CONDA" env export -p "$(winpath "$ENV")" --override-channels -c conda-forge 2>/dev/null | tr -d '\r' \
     | grep -v '^prefix:' | sed 's/^name: .*/name: masscube_hiv/' > "$ROOT/config/environment.lock.yml"
 
@@ -153,10 +131,8 @@ set_conf TRFP "$TRFP"
 echo "01_install: cleaning caches" | tee -a "$LOG"
 "$CONDA" clean -a -y 2>&1 | tail -3 | tee -a "$LOG"
 "${PY[@]}" -m pip cache purge 2>&1 | tee -a "$LOG" || true
-# conda clean keeps the extracted packages an environment uses. On the
-# same drive they are hard links to the files in env/, so deleting them
-# frees no space; it does stop every size measurement counting those
-# files twice, and the cache is not needed once env/ exists.
+# What conda clean leaves are hard links into env/: no space saved by
+# deleting them, but otherwise every size check counts those files twice.
 rm -rf "$ROOT/.cache/tmp" "$ROOT/.cache/pip" "$ROOT/.cache/conda_pkgs"
 mkdir -p "$ROOT/.cache/tmp"
 echo "01_install: env/ is $(gb "$(any_python -I "$ROOT/scripts/lib/disk_usage.py" "$(native_path "$ENV")")") GB after cleaning" | tee -a "$LOG"

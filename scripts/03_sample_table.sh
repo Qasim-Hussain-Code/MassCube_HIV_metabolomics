@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
-# Write the MassCube sample tables for both ion modes from the deposited
-# ISA-Tab, and stop if any study sample lacks a group label.
-#
-# Usage: scripts/03_sample_table.sh [--force] [--help]
-#
-# Writes config/sample_table_pos.csv, config/sample_table_neg.csv and
-# results/sample_counts.tsv. Injection order and batch are left empty;
-# the conversion stage fills them from each file's acquisition time.
-
+# MassCube sample tables for both modes from the deposited ISA-Tab.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,7 +11,7 @@ FORCE=0
 for arg in "$@"; do
     case "$arg" in
         --force) FORCE=1 ;;
-        --help|-h) sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/03_sample_table.sh [--force]"; exit 0 ;;
         *) echo "unknown argument: $arg" >&2; exit 2 ;;
     esac
 done

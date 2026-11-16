@@ -1,26 +1,7 @@
-"""Download, convert and process one ion mode, one raw file at a time.
-
-For each file, in turn: check the disk budget, download the raw file and
-verify its published sha256, convert it with ThermoRawFileParser, check
-the mzML, run MassCube's single-file processing on it, record its start
-time, and delete the raw file and the mzML. What stays is MassCube's
-per-file feature table (single_files/<name>.txt), its scan cache
-(tmp/<name>.mzpkl, which gap filling reads in place of the mzML) and a
-row of results/conversion_manifest.tsv. A file whose outputs already
-exist is skipped, so an interrupted run resumes at the next file.
-
-MassCube's own workflow function expects every mzML of a mode in its data
-folder at once, which the disk budget does not allow (preregistration.md,
-sections 4 and 15). This driver prepares Params the way that function's
-preparation step does and calls process_single_file with a copy of them
-for each file, as the workflow's joblib workers receive a pickled copy.
-
-Usage:
-  python process_mode.py --root ROOT --mode pos|neg [--pilot] [--limit N] [--connections K]
-
---pilot processes the six pilot files of preregistration.md section 15
-and writes results/<mode>_pilot.tsv; --limit N stops after N files.
-"""
+#!/usr/bin/env python3
+# One raw file at a time: download, verify, convert, check, MassCube, delete raw and mzML.
+# MassCube's workflow wants a whole mode's mzML on disk at once; 115 of them don't fit in 10 GB.
+# What stays per file: single_files/<name>.txt, tmp/<name>.mzpkl (gap filling reads it later) and a manifest row.
 
 from __future__ import annotations
 
@@ -56,8 +37,6 @@ MANIFEST_FIELDS = [
 ]
 
 
-
-
 def check_space(root: str, conf: dict, incoming: int) -> None:
     used = tree_bytes(root)
     free = shutil.disk_usage(root).free
@@ -72,15 +51,10 @@ def check_space(root: str, conf: dict, incoming: int) -> None:
 
 
 def inspect_mzml(path: str) -> dict:
-    """Scan counts, centroid flags, polarity and times, read line by line.
-
-    ThermoRawFileParser writes one element per line, so the cvParams that
-    matter can be read without decoding any binary array.
-    """
+    # TRFP writes one element per line, so this never has to decode a binary array
     out = {"ms1": 0, "ms2": 0, "centroid": 0, "profile": 0, "pos": 0, "neg": 0,
            "first": None, "last": None, "start": None, "spectra": 0}
-    # Flags are counted once per spectrum and only inside <spectrum>, so a
-    # cvParam in a header group or on a chromatogram cannot inflate them.
+    # once per spectrum, inside <spectrum> only: header groups and chromatograms carry the same cvParams
     inside = False
     seen: set[str] = set()
     with open(path, encoding="utf-8", errors="replace") as fh:
@@ -118,14 +92,8 @@ def inspect_mzml(path: str) -> dict:
 
 
 def parse_start(stamp: str) -> datetime.datetime:
-    """The mzML run's startTimeStamp as an aware datetime.
-
-    ThermoRawFileParser writes seven fractional digits
-    (2022-10-13T20:05:39.4620643Z). Python's %f takes at most six, which is
-    why MassCube's own get_start_time returns None for these files and its
-    workflow would fall back to sample-table order; the seventh digit is
-    dropped here instead.
-    """
+    # TRFP: 2022-10-13T20:05:39.4620643Z. %f stops at six digits, which is why MassCube's
+    # get_start_time gives None and its workflow would quietly order by the sample table.
     m = re.fullmatch(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:?\d{2})?", stamp)
     if not m:
         raise ValueError(f"unreadable startTimeStamp {stamp!r}")
@@ -139,24 +107,21 @@ def parse_start(stamp: str) -> datetime.datetime:
     return t.replace(tzinfo=offset)
 
 
+# TRFP 1.4.5 metadata JSON term -> manifest column.
+# mass_resolution reads 0.5 on these files; it isn't resolving power, so nothing is read into it.
 TRFP_TERMS = {
-    # accession or name in ThermoRawFileParser 1.4.5's metadata JSON -> manifest column
-    "MS:1000494": "instrument_model",     # Thermo Scientific instrument model
-    "MS:1000529": "instrument_serial",    # instrument serial number
-    "MS:1000011": "mass_resolution",      # mass resolution
-    "NCIT:C69199": "creation_date",       # content creation date
+    "MS:1000494": "instrument_model",
+    "MS:1000529": "instrument_serial",
+    "MS:1000011": "mass_resolution",
+    "NCIT:C69199": "creation_date",
     "expected runtime": "expected_runtime",
     "NCIT:C41275": "vial",
-    "AFR:0002045": "method_file",         # device acquisition method
+    "AFR:0002045": "method_file",
 }
 
 
 def trfp_metadata(path: str) -> dict:
-    """The instrument and acquisition fields of ThermoRawFileParser's JSON.
-
-    Each section is a list of CV terms; keys are matched case-insensitively
-    because the serialiser's capitalisation is not part of its documentation.
-    """
+    # keys lower-cased: the JSON's capitalisation isn't documented anywhere
     with open(path, encoding="utf-8") as fh:
         meta = json.load(fh)
     out = {col: "" for col in TRFP_TERMS.values()}
@@ -172,6 +137,7 @@ def trfp_metadata(path: str) -> dict:
 
 
 def pilot_files(table: list[dict], seed: int) -> list[str]:
+    # prereg section 15: first and last QC, then 2 HC, 1 INR, 1 IR drawn with the seed
     qcs = sorted((r for r in table if r["is_qc"] == "yes"), key=lambda r: int(re.sub(r"\D", "", r["sample_name"])))
     rng = random.Random(seed)
     pick = [qcs[0]["sample_name"], qcs[-1]["sample_name"]]
@@ -239,16 +205,14 @@ def main() -> None:
             break
         entry = listing[name]
         size = int(entry["size_bytes"])
-        # The raw file, its mzML (measured on the pilot at up to a few times the
-        # raw size) and MassCube's outputs must all fit before the download starts.
+        # raw + mzML (QC1: 154 MB from 335) + MassCube's outputs, with room to spare
         check_space(root, conf, size * 4)
 
         raw = os.path.join(raw_dir, raw_name)
         t0 = time.monotonic()
         got = download(f"{BASE}/{raw_name}", raw, size=size, sha256=entry["sha256_published"], connections=a.connections)
         t_download = time.monotonic() - t0
-        # A raw file already on disk from an interrupted run is only re-verified;
-        # its time is not a download time and is recorded as NA.
+        # left over from an interrupted run: only re-hashed, so its time is no download time (NA below)
         verb = "already present" if got.get("resumed") else f"downloaded in {t_download:.0f} s"
         print(f"{name}: {size / 1024**2:.0f} MB {verb}, sha256 verified")
 
@@ -295,8 +259,7 @@ def main() -> None:
         t0 = time.monotonic()
         process_single_file(mzml, copy.deepcopy(params), return_data=False)
         t_masscube = time.monotonic() - t0
-        # process_single_file reports its own failures by printing and returning
-        # None, so its outputs are the only reliable sign that it worked.
+        # on failure it prints and returns None, so check for the files instead
         if not (os.path.exists(txt) and os.path.exists(mzpkl)):
             sys.exit(f"{name}: MassCube single-file processing left no output (see the console log)")
         with open(txt, encoding="utf-8") as fh:
@@ -308,7 +271,7 @@ def main() -> None:
             "ms1_scans": info["ms1"], "ms2_scans": info["ms2"], "all_centroid": "yes", "polarity": mode,
             **acq,
             "run_start": run_start.isoformat(), "first_scan_min": f"{info['first']:.4f}", "last_scan_min": f"{info['last']:.4f}",
-            # Kept to show what MassCube itself reads from the same header (None for these files).
+            # what MassCube itself makes of the header, kept as evidence for deviation 1
             "masscube_ms_type": ms_type, "masscube_ion_mode": mc_mode, "masscube_start_time": mc_start.isoformat() if mc_start else "None",
             "features": n_features, "single_file_bytes": os.path.getsize(txt), "mzpkl_bytes": os.path.getsize(mzpkl),
             "download_s": "NA" if got.get("resumed") else f"{t_download:.0f}", "convert_s": f"{t_convert:.0f}", "masscube_s": f"{t_masscube:.0f}",
@@ -316,9 +279,7 @@ def main() -> None:
             "peak_rss_so_far_mb": f"{getattr(me.memory_info(), 'peak_wset', me.memory_info().rss) / 1024**2:.0f}",
             "project_bytes_after": "", "processed": datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%S%z"),
         }
-        # The pilot keeps its raw files until the m/z tolerance rule has been
-        # applied (preregistration.md, section 7), so reprocessing needs no
-        # second download; every other raw file goes as soon as it is done.
+        # pilot raw files wait for the m/z rule (prereg section 7) in case the pilot has to be redone
         if not a.pilot:
             os.remove(raw)
         os.remove(mzml)
@@ -331,8 +292,7 @@ def main() -> None:
               f"convert {t_convert:.0f} s, MassCube {t_masscube:.0f} s")
 
     if a.pilot:
-        # Rebuilt from the manifest, so a pilot that was interrupted and
-        # resumed still lists all of its files, in pilot order.
+        # from the manifest, so a resumed pilot still lists all six
         with open(manifest, encoding="utf-8") as fh:
             rows = {r["file"]: r for r in csv.DictReader(fh, delimiter="\t") if r["mode"] == mode}
         pilot = [rows[n + ".raw"] for n in names if n + ".raw" in rows]

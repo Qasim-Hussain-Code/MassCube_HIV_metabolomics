@@ -1,14 +1,5 @@
-"""Record the antiretroviral drugs of the positive control with identifiers.
-
-The list is the one in preregistration.md, section 9: the drugs used in
-Chinese ART regimens over the study period, with azvudine and ainuovirine,
-both approved in China. Each is looked up in PubChem by name for its CID,
-InChIKey, formula and monoisotopic mass, which the annotation stage uses
-to pick reference spectra out of the GNPS Drug Library and to recognise
-MassCube database hits as drugs.
-
-Usage: python build_drug_list.py --out config/antiretrovirals.tsv
-"""
+#!/usr/bin/env python3
+# config/antiretrovirals.tsv: the prereg section 9 drug list with PubChem ids; 07 picks GNPS spectra by InChIKey.
 
 from __future__ import annotations
 
@@ -20,8 +11,8 @@ import time
 import urllib.parse
 import urllib.request
 
+# Chinese ART regimens of the study period; azvudine and ainuovirine are China-only approvals
 DRUGS = [
-    # name, class
     ("tenofovir", "NRTI"), ("tenofovir disoproxil", "NRTI prodrug"), ("tenofovir alafenamide", "NRTI prodrug"),
     ("emtricitabine", "NRTI"), ("lamivudine", "NRTI"), ("zidovudine", "NRTI"), ("abacavir", "NRTI"),
     ("azvudine", "NRTI"), ("efavirenz", "NNRTI"), ("rilpivirine", "NNRTI"), ("nevirapine", "NNRTI"),

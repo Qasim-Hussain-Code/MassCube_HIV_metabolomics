@@ -1,37 +1,7 @@
-"""Annotate both ion modes, export their tables and normalise them.
-
-preregistration.md, sections 8 and 9. Runs only after both modes are
-aligned and their scan caches deleted, so the database never shares the
-disk with them.
-
-1. The newest version of the MassCube MS/MS database on Zenodo is fetched
-   and checked against its md5, loaded once (load_ms2_db), and the time and
-   resident memory that cost are recorded. Both modes are annotated from
-   that one object: MassCube's annotate_aligned_features calls
-   load_ms2_db itself, so that function is replaced by one that returns the
-   object already loaded.
-2. The antiretroviral reference spectra are taken from the GNPS Drug
-   Library (Zenodo), only for the drugs in config/antiretrovirals.tsv
-   (matched by InChIKey first block), and written as an MSP. MassCube
-   1.2.22 has no index_msp_to_pkl; its load_ms2_db reads an MSP and indexes
-   it in memory with the same unweighted entropy similarity it uses for
-   the main database, which is the route taken here.
-3. For each mode: the grouped aligned features are searched against the
-   drug spectra on a copy (identity search only), then annotated against
-   the main database with MassCube's own function and parameters
-   (identity search, then fuzzy search). The table and MSP exports follow
-   the workflow, MS2 mirror plots go to work/<mode>/ms2_matching/, and the
-   annotation level of each feature is assigned by the pre-registered rule.
-4. Normalisation as MassCube applies it: LOWESS drift correction where the
-   drift rule switched it on, then probabilistic quotient normalisation,
-   for peak height and, as the sensitivity analysis, peak area.
-   Conditioning QCs are left out of both.
-
-Usage: python annotate.py --root ROOT [--test --library MSP]
-
---test annotates work/pos/test/ against a local MSP library given with
---library, skips both downloads, and writes to work/pos/test/.
-"""
+#!/usr/bin/env python3
+# Both modes against the MassCube MS/MS database and the GNPS antiretroviral spectra, then
+# LOWESS (if 06 switched it on) and PQN. Prereg sections 8 and 9.
+# --test --library x.msp: work/pos/test/ against a local library, no downloads.
 
 from __future__ import annotations
 
@@ -82,7 +52,10 @@ def fetch_database(root: str, conf: dict) -> str:
 
 
 def drug_library(root: str, conf: dict) -> tuple[str, pd.DataFrame]:
-    """The antiretroviral spectra of the GNPS Drug Library, as an MSP."""
+    # Written as MSP: MassCube 1.2.22 has no index_msp_to_pkl, and load_ms2_db indexes an MSP
+    # in memory with the same unweighted entropy as the main database (deviation 3).
+    # TODO(qasim): the MGF field names below (inchikey, ionmode, pepmass, adduct, spectrumid)
+    # were never checked against the real file; look at its first record before trusting the subset.
     from pyteomics import mgf
     from record_versions import fetch_json
 
@@ -114,7 +87,7 @@ def drug_library(root: str, conf: dict) -> tuple[str, pd.DataFrame]:
                 msp.write(f"{mz:.5f}\t{it:.1f}\n")
             msp.write("\n")
             kept.append({"drug": first[key], "ion_mode": mode, "adduct": p.get("adduct", ""), "precursor_mz": prec})
-    os.remove(src)  # 338 MB; the subset is all that is used
+    os.remove(src)  # 338 MB, and only the subset is needed
     summary = (pd.DataFrame(kept, columns=["drug", "ion_mode", "adduct", "precursor_mz"])
                .groupby(["drug", "ion_mode"]).size().rename("spectra").reset_index())
     summary = drugs[["drug", "class"]].merge(summary, on="drug", how="left").fillna({"spectra": 0})
@@ -123,7 +96,7 @@ def drug_library(root: str, conf: dict) -> tuple[str, pd.DataFrame]:
 
 
 def level_of(f) -> int:
-    """Annotation level, preregistration.md section 9."""
+    # prereg section 9: level 2 needs identity search, similarity > 0.7, >= 3 peaks and <= 10 ppm
     mode = f.search_mode or ""
     if mode == "identity_search" and f.similarity is not None and f.similarity > 0.7 \
             and (f.matched_peak_number or 0) >= 3 and f.matched_precursor_mz:
@@ -151,6 +124,7 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     params.sample_metadata = meta
     names = list(meta.iloc[:, 0])
 
+    # drugs on copies, identity search only, so the main annotation below starts clean
     drug_rows = []
     if drug_msp:
         p_drug = copy.copy(params)
@@ -191,7 +165,7 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
         "level": levels[f.id], "database": f.database} for f in features])
     ann.to_csv(os.path.join(out, f"{tag}_annotation.tsv.gz"), sep="\t", index=False)
 
-    # Per-sample detection before gap filling, which the filters use.
+    # detected before gap filling, which is what 08's detection filters count
     det = pd.DataFrame(np.array([f.feature_id_arr != -1 for f in features], dtype=np.int8), columns=names)
     det.insert(0, "feature_ID", [f.id for f in features])
     det.to_csv(os.path.join(out, f"{tag}_detected.tsv.gz"), sep="\t", index=False)
@@ -201,8 +175,9 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     with open(msp, "rb") as src, gzip.open(os.path.join(out, f"{tag}_features.msp.gz"), "wb") as dst:
         shutil.copyfileobj(src, dst)
     if os.path.getsize(os.path.join(out, f"{tag}_features.msp.gz")) > 20 * 1024**2:
-        os.remove(os.path.join(out, f"{tag}_features.msp.gz"))  # over 20 MB: kept in work/ only
+        os.remove(os.path.join(out, f"{tag}_features.msp.gz"))  # too big to track; stays in work/
 
+    # conditioning QCs out of the normalisation
     keep = ~meta["conditioning_qc"].astype(bool)
     meta_n = meta[keep].reset_index(drop=True)
     dropped = list(meta.loc[~keep, meta.columns[0]])
@@ -219,8 +194,7 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
         t[["feature_ID"] + names].to_csv(os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_raw.tsv.gz"), sep="\t", index=False)
         normalise(t, params.signal_normalization).to_csv(
             os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_normalised.tsv.gz"), sep="\t", index=False)
-    # The drift sensitivity analysis needs heights normalised the other way
-    # (section 10); MassCube's LOWESS needs at least three QCs to run at all.
+    # the other LOWESS choice too, for the sensitivity analysis; LOWESS won't run on fewer than 3 QCs
     if int(meta_n["is_qc"].sum()) >= 3:
         t = convert_features_to_df(features=features, sample_names=names, quant_method="peak_height")
         normalise(t, not params.signal_normalization).to_csv(
@@ -267,8 +241,7 @@ def main() -> None:
     original = mca.load_ms2_db
 
     def load_once(path):
-        # annotate_aligned_features loads the library itself on every call;
-        # the main database is loaded once above and handed back here.
+        # annotate_aligned_features reloads the library on every call; one load serves both modes
         if path not in loaded:
             loaded[path] = original(path)
         return loaded[path]
@@ -279,7 +252,7 @@ def main() -> None:
         out = work_files if a.test else os.path.join(root, "results")
         annotate_mode(root, tag, library, drug_msp, out, work_files)
     if not a.test:
-        os.remove(library)  # 3.3 GB; fetched again, md5-checked, if the stage is rerun
+        os.remove(library)  # 3.3 GB; a rerun fetches it again
 
 
 if __name__ == "__main__":

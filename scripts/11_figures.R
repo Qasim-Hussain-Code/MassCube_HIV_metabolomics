@@ -1,20 +1,5 @@
-## Stage 11: the figures, all from the tables in results/ (and, for the MS2
-## mirror plots, MassCube's annotated feature tables in work/). Nothing is
-## recomputed here except QC RSDs for the drift figure.
-##
-## Every figure is written as a 300 dpi PNG and a PDF, in the Okabe-Ito
-## palette, with the same colour for each group throughout, n per group in
-## the legend, and exact values rather than stars.
-##
-## Usage: scripts/lib/in_env.sh Rscript scripts/11_figures.R
-##
-## Figures:
-##   figures/fig1_qc_overview         intensity by run order with QCs, and PCA with QCs, per mode
-##   figures/fig2_qc_rsd              QC RSD with and without LOWESS drift correction
-##   figures/fig3_volcano             PLWH against HC per mode, coloured by annotation level
-##   figures/fig4_antiretrovirals     detection of each antiretroviral by group
-##   figures/fig5_pathways            pathway over-representation against the stated background
-##   figures/supplementary/ms2_*      mirror plots for the level 2 compounds the README names
+#!/usr/bin/env Rscript
+## Figures from results/; only the QC RSDs in fig 2 are computed here. PNG at 300 dpi plus PDF.
 
 suppressPackageStartupMessages({
     library("data.table")
@@ -30,7 +15,7 @@ dir.create(file.path(fig_dir, "supplementary"), recursive = TRUE, showWarnings =
 set.seed(20261109)
 theme_set(theme_bw(base_size = 9) + theme(panel.grid.minor = element_blank()))
 
-## Okabe-Ito, one colour per group everywhere.
+## Okabe-Ito; a group keeps its colour in every figure
 okabe <- c(HC = "#0072B2", PLWH = "#D55E00", QC = "#E69F00", INR = "#CC79A7", IR = "#009E73")
 level_col <- c(`2` = "#009E73", `3` = "#CC79A7", `4` = "#BBBBBB")
 modes <- c(pos = "positive", neg = "negative")

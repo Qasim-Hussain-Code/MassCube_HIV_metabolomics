@@ -1,27 +1,6 @@
-"""Elastic-net classifier of PLWH against HC, exploratory and not diagnostic.
-
-preregistration.md, section 12. Representative features of both modes,
-joined by participant; drug-derived features excluded for the main model
-and included for the comparison model. Repeated nested cross-validation:
-5 outer folds, 5 inner, 10 repeats, stratified. Inside each outer training
-fold the missing values are set to half the feature's training minimum (on
-the log2 scale, the minimum minus one) and the features autoscaled; the
-inner loop, run on that training fold, picks l1_ratio from 0.1, 0.5 and 0.9
-and C from 12 values log-spaced from 0.001 to 100, by AUC, and the chosen
-model is refitted on the whole training fold. The inner loop is
-scikit-learn's LogisticRegressionCV, which searches the same grid over the
-same folds as a grid search would but warm-starts along the C path; an
-explicit grid search was about 27,000 saga fits for the three models and
-had not finished a simulated test in 45 minutes. Each participant's out-of-fold probability is
-averaged over the 10 repeats; AUC on those, with a 95 per cent interval
-from 2,000 stratified bootstrap resamples. The negative control repeats the
-whole procedure with the labels permuted once.
-
-Writes results/classifier.tsv (one row per model) and
-results/classifier_predictions.tsv.gz (averaged out-of-fold probabilities).
-
-Usage: python classifier.py --root ROOT [--jobs N]
-"""
+#!/usr/bin/env python3
+# Elastic net PLWH vs HC, exploratory, not a diagnostic (prereg 12). 10 x 5-fold nested CV; imputation and
+# scaling are fitted inside each training fold. Third model = same thing with the labels permuted once.
 
 from __future__ import annotations
 
@@ -48,7 +27,7 @@ CS = list(np.logspace(-3, 2, 12))
 
 
 class HalfMin(BaseEstimator, TransformerMixin):
-    """Half the training minimum per feature, on log2 values: minimum minus one."""
+    # half the training-fold minimum = min - 1 on log2
 
     def fit(self, x, y=None):
         self.fill_ = np.nanmin(x, axis=0) - 1
@@ -84,6 +63,9 @@ def participant_matrix(res: str, drugs: bool) -> tuple[pd.DataFrame, pd.Series]:
 
 def fit_fold(x: np.ndarray, y: np.ndarray, train: np.ndarray, test: np.ndarray, r: int, k: int, seed: int) -> tuple:
     inner = StratifiedKFold(5, shuffle=True, random_state=seed + 100 + r)
+    # LogisticRegressionCV searches the pre-registered grid on the same inner folds a GridSearchCV
+    # would, warm-starting along C. GridSearchCV was ~27,000 saga fits and hadn't finished the
+    # simulated test in 45 min. A looser tol (1e-3) changed the chosen C, so the default stays.
     pipe = Pipeline([("impute", HalfMin()), ("scale", StandardScaler()),
                      ("clf", LogisticRegressionCV(Cs=CS, l1_ratios=L1_RATIOS, solver="saga", cv=inner, scoring="roc_auc",
                                                   max_iter=5000, n_jobs=1, refit=True, random_state=seed,
@@ -96,9 +78,7 @@ def fit_fold(x: np.ndarray, y: np.ndarray, train: np.ndarray, test: np.ndarray, 
 
 
 def nested_cv(x: np.ndarray, y: np.ndarray, seed: int, jobs: int) -> tuple[np.ndarray, list[dict]]:
-    # The 50 outer folds run in parallel, each with a single-threaded inner
-    # search; every fold has a fixed random state, so the result does not
-    # depend on how the folds are spread over processes.
+    # 50 outer folds in parallel, each with fixed seeds, so the result doesn't depend on the worker count
     folds = [(train, test, r, k) for r in range(10)
              for k, (train, test) in enumerate(StratifiedKFold(5, shuffle=True, random_state=seed + r).split(x, y))]
     out = Parallel(n_jobs=jobs, backend="loky")(delayed(fit_fold)(x, y, tr, te, r, k, seed) for tr, te, r, k in folds)

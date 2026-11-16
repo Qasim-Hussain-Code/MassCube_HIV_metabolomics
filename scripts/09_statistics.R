@@ -1,21 +1,5 @@
-## Stage 09: the pre-registered test of PLWH against HC, its sensitivity
-## analyses, the exploratory INR against IR contrast, and power
-## (preregistration.md, sections 10, 11 and 13).
-##
-## Reads the log2 matrices of the representative features written by
-## stage 08 (results/<mode>_matrix_<variant>.tsv.gz) and the sample
-## sheets (results/<mode>_samples.tsv).
-##
-## Usage: scripts/lib/in_env.sh Rscript scripts/09_statistics.R [--force]
-##
-## Outputs:
-##   results/<mode>_limma.tsv.gz           primary result per feature, with annotation
-##   results/<mode>_sensitivity.tsv.gz     every sensitivity analysis, per feature
-##   results/sensitivity_summary.tsv       primary hits kept and sign agreement, per analysis
-##   results/<mode>_limma_inr_ir.tsv.gz    exploratory INR against IR
-##   results/test_counts.tsv               features tested and called, per mode and analysis; n_reference
-##                                         is HC (IR for the exploratory contrast), n_comparison PLWH (INR)
-##   results/power.tsv                     minimum detectable standardised difference
+#!/usr/bin/env Rscript
+## limma PLWH vs HC, the sensitivity analyses, INR vs IR and power (prereg sections 10, 11, 13)
 
 suppressPackageStartupMessages({
     library("data.table")
@@ -41,8 +25,7 @@ read_matrix <- function(tag, variant) {
     m
 }
 
-## Features with at least 3 non-missing values in each group are tested
-## (section 10); the same rule for every analysis, so they stay comparable.
+## >= 3 values in each group, and the same rule for every sensitivity analysis
 testable <- function(m, g) {
     ok <- rowSums(!is.na(m[, g == "HC", drop = FALSE])) >= min_per_group &
         rowSums(!is.na(m[, g == "PLWH", drop = FALSE])) >= min_per_group
@@ -68,14 +51,13 @@ per_feature_test <- function(m, g, fun) {
     data.table(feature_ID = as.integer(rownames(m)), logFC = lfc, p = p, q = p.adjust(p, "BH"))
 }
 
-## Half of the feature's smallest observed value; on the log2 scale that is
-## the minimum minus one.
+## half the minimum is min - 1 on log2
 half_min <- function(m) {
     t(apply(m, 1, function(x) { x[is.na(x)] <- min(x, na.rm = TRUE) - 1; x }))
 }
 
-## Exact two-sample t power by integrating the normal tails over the
-## chi-square distribution of the variance (section 11).
+## Exact t power, integrated over the chi-square of the variance. statsmodels
+## came out non-monotone in alpha and scipy's nct gave NaN at these sizes.
 power_t <- function(d, n1, n2, alpha) {
     df <- n1 + n2 - 2; k <- sqrt(n1 * n2 / (n1 + n2)); tc <- qt(1 - alpha / 2, df)
     integrate(function(v) (pnorm(tc * sqrt(v / df) - d * k, lower.tail = FALSE) + pnorm(-tc * sqrt(v / df) - d * k)) * dchisq(v, df),
@@ -108,7 +90,6 @@ for (tag in names(modes)) {
                                                lower_in_plwh = prim[q < 0.05 & logFC < 0, .N],
                                                n_reference = sum(g == "HC"), n_comparison = sum(g == "PLWH"))
 
-    ## Sensitivity analyses: each returns feature-level results comparable with the primary.
     sens <- list()
     sens[["welch"]] <- per_feature_test(m, g, function(a, b) t.test(a, b, var.equal = FALSE))
     sens[["wilcoxon"]] <- per_feature_test(m, g, function(a, b) wilcox.test(a, b, exact = FALSE))
@@ -138,7 +119,7 @@ for (tag in names(modes)) {
                                                    n_reference = NA_integer_, n_comparison = NA_integer_)
     }
 
-    ## Exploratory: INR against IR among PLWH, same model and rules.
+    ## INR vs IR, exploratory
     sub <- incl[group == "PLWH"]
     ms <- primary_m[, sub$sample_name, drop = FALSE]
     gs <- ifelse(sub$subgroup == "INR", "PLWH", "HC")  # testable() reads the two labels; INR plays PLWH, IR plays HC

@@ -8,7 +8,7 @@ the data source publishes, so a fresh clone recreates it exactly.
 |---|---|---|---|
 | `metadata/` | `scripts/02_download_metadata.sh` | the MTBLS9264 ISA-Tab (`i_`, `s_` and two `a_` files), the two metabolite assignment files (`m_..._maf.tsv`, not used by the analysis), the published checksum lists and the MetaboLights study record | sha256 in `HASHES/metadata_sha256.json` |
 | `raw/pos/`, `raw/neg/` | `scripts/04_process_mode.sh` | one Thermo `.raw` file at a time, deleted as soon as it has been converted and processed | sha256 in `HASHES/data_sha256.json` |
-| `db/` | the annotation stage | the MassCube MS/MS database pickle from Zenodo, and the indexed subset of the GNPS Drug Library | md5 in the Zenodo record, recorded in `config/tool_versions.tsv` |
+| `db/` | `scripts/07_annotate.sh` | the MassCube MS/MS database pickle from Zenodo (3.3 GB, deleted again at the end of the stage) and the antiretroviral subset of the GNPS Drug Library as an MSP | md5 in the Zenodo record, recorded in `config/tool_versions.tsv` |
 
 The raw files are about 300 MB each and 72,715,682,516 bytes in all
 (`results/mtbls9264_study.tsv`), more than the 10 GB this project allows

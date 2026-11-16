@@ -1,19 +1,6 @@
 #!/usr/bin/env bash
-# Annotate both ion modes with the MassCube MS/MS database and the
-# antiretroviral spectra of the GNPS Drug Library, export the feature
-# tables, and normalise them. Runs only once both modes are aligned and
-# their scan caches deleted, so the database never shares the disk with
-# them (preregistration.md, sections 9 and 15).
-#
-# Usage: scripts/07_annotate.sh [--force] [--help]
-#
-# Writes results/database_version.tsv, database_load.tsv,
-# drug_library_subset.tsv, and per mode <mode>_annotation.tsv.gz,
-# <mode>_drug_hits.tsv, <mode>_features.tsv.gz, <mode>_detected.tsv.gz,
-# <mode>_height_raw.tsv.gz, <mode>_height_normalised.tsv.gz,
-# <mode>_area_raw.tsv.gz, <mode>_area_normalised.tsv.gz and, when under
-# 20 MB, <mode>_features.msp.gz. The 3.3 GB database is deleted at the end.
-
+# MS/MS annotation of both modes, then normalised tables. The 3.3 GB database
+# only comes down after both modes' caches are gone (prereg section 14).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -24,7 +11,7 @@ FORCE=0
 for arg in "$@"; do
     case "$arg" in
         --force) FORCE=1 ;;
-        --help|-h) sed -n '2,17p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/07_annotate.sh [--force]"; exit 0 ;;
         *) echo "unknown argument: $arg" >&2; exit 2 ;;
     esac
 done

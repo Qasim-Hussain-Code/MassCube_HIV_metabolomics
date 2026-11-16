@@ -1,24 +1,6 @@
-"""Apply the pilot's m/z tolerance rule and project the full mode.
-
-preregistration.md, sections 7 and 16. The 200 most intense features of
-the pilot file of median total intensity are matched in every other pilot
-file within 0.02 Da and 0.5 min; if the 99th percentile of their m/z range
-across files exceeds 0.01 Da, mz_tol_ms1 and mz_tol_alignment become
-0.015 Da for that mode and the pilot is processed again. Tolerances are
-never narrowed. The internal standard's mass error is reported either way.
-
-The projection uses the pilot's measured time, memory and sizes per file,
-scaled to the number of files in the mode, and is written before the full
-mode starts so that it can be set against the actual figure afterwards.
-
-Exit status 10 means the tolerance was widened and the pilot must be
-processed again (scripts/05_pilot_rules.sh does that).
-
-Usage: python pilot_rules.py --root ROOT --mode pos|neg [--test]
-
---test runs on whichever pilot files exist and writes to work/<mode>/test/
-instead of results/, leaving the parameter files and raw files alone.
-"""
+#!/usr/bin/env python3
+# Prereg sections 7 and 16: m/z rule on the pilot (widen to 0.015 Da if the p99 m/z range > 0.01, never narrow)
+# and a projection for the whole mode, written before it runs. Exit 10 = widened, 05_pilot_rules.sh redoes the pilot.
 
 from __future__ import annotations
 
@@ -43,7 +25,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
     ap.add_argument("--mode", required=True, choices=sorted(MODES))
-    ap.add_argument("--test", action="store_true")
+    ap.add_argument("--test", action="store_true", help="whatever pilot files exist, output to work/<mode>/test/")
     ap.add_argument("--reset-pilot", action="store_true",
                     help="remove the pilot's MassCube outputs and manifest rows so it can be processed again")
     a = ap.parse_args()
@@ -102,13 +84,11 @@ def main() -> int:
         rows.append({"file": n, "subgroup": man.loc[n, "subgroup"], **internal_standard(tables[n], mode)})
     pd.DataFrame(rows).to_csv(os.path.join(out_dir, f"{tag}_pilot_internal_standard.tsv"), sep="\t", index=False)
 
-    # Projection for the whole mode from what the pilot measured.
     p = man.loc[have]
     num = lambda c: pd.to_numeric(p[c], errors="coerce")
     n_mode = len(table)
     per_file_out = (num("single_file_bytes") + num("mzpkl_bytes")).mean()
-    # Only files that were actually downloaded in this run count toward the
-    # rate; a file found already on disk has its download time as NA.
+    # download_s is NA for files that were already on disk
     dl = p[pd.to_numeric(p["download_s"], errors="coerce").notna()]
     raw_mb_s = (pd.to_numeric(dl["raw_bytes"]).sum() / pd.to_numeric(dl["download_s"]).clip(lower=1).sum() / 1024**2
                 if len(dl) else float("nan"))
@@ -125,8 +105,7 @@ def main() -> int:
         "projected_processing_h": n_mode * (num("convert_s").mean() + num("masscube_s").mean()) / 3600,
         "projected_download_h_at_pilot_rate": num("raw_bytes").mean() * n_mode / max(raw_mb_s, 1e-9) / 1024**2 / 3600,
         "project_gb_now": project_now / 1024**3,
-        # Peak before alignment: today's project without the pilot's kept raw
-        # files, the remaining files' outputs, and one raw file and its mzML in flight.
+        # now, minus the pilot's raw files, plus every remaining file's outputs and one raw+mzML in flight
         "projected_peak_gb": (project_now - kept_raw + (n_mode - len(have)) * per_file_out
                               + num("raw_bytes").max() + num("mzml_bytes").max()) / 1024**3,
         "ceiling_gb": float(conf["DISK_CEILING_GB"]),

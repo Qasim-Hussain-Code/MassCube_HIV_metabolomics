@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
-# Injection QC, the run order test, the feature filters, the collapse to
-# one feature per MassCube group, the antiretroviral positive control and
-# the PCA with QCs (preregistration.md, sections 5, 6, 8 and 9). Writes the
-# log2 matrices the statistics stage reads.
-#
-# Usage: scripts/08_qc_filters.sh [--force] [--help]
-#
-# Outputs are listed in scripts/lib/qc_filters.py.
-
+# Injection QC, feature filters, antiretroviral control; writes the matrices 09 reads.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -18,7 +10,7 @@ FORCE=0
 for arg in "$@"; do
     case "$arg" in
         --force) FORCE=1 ;;
-        --help|-h) sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/08_qc_filters.sh [--force]"; exit 0 ;;
         *) echo "unknown argument: $arg" >&2; exit 2 ;;
     esac
 done

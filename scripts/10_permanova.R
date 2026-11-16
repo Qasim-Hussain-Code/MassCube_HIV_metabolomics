@@ -1,14 +1,5 @@
-## Stage 10 (part): PERMANOVA of PLWH against HC, exploratory
-## (preregistration.md, section 12).
-##
-## vegan adonis2 on Euclidean distances between autoscaled log2 profiles of
-## the representative features, 9,999 permutations, per mode. A distance
-## needs complete data, so missing values are set to half the feature's
-## minimum (on the log2 scale, the minimum minus one) for this analysis only.
-##
-## Usage: scripts/lib/in_env.sh Rscript scripts/10_permanova.R
-##
-## Output: results/permanova.tsv
+#!/usr/bin/env Rscript
+## PERMANOVA PLWH vs HC per mode (exploratory, prereg section 12)
 
 suppressPackageStartupMessages({
     library("data.table")
@@ -26,6 +17,7 @@ for (tg in names(modes)) {
     s <- fread(file.path(res_dir, sprintf("%s_samples.tsv", tg)))[excluded == FALSE]
     d <- fread(file.path(res_dir, sprintf("%s_matrix_primary.tsv.gz", tg)))
     m <- t(as.matrix(d[, s$sample_name, with = FALSE]))
+    ## dist() needs complete data: half minimum here, and only here
     m <- apply(m, 2, function(x) { x[is.na(x)] <- min(x, na.rm = TRUE) - 1; x })
     m <- m[, apply(m, 2, sd) > 0, drop = FALSE]
     set.seed(20261109)

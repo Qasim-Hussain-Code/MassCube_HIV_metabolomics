@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# The checks run before the repository is handed over. Each prints what it
-# found; the exit status is 1 if any check fails.
-#
-# Usage: scripts/lib/final_checks.sh
+# Checks to pass before tagging v1.0; exit 1 if any fails.
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT" || exit 1
@@ -26,7 +23,7 @@ echo "== 2. every figure the README shows exists and a script writes it =="
 while read -r fig; do
     if [[ ! -s "$fig" ]]; then echo "MISSING: $fig"; status=1; continue; fi
     stem="$(basename "$fig" .png)"
-    # Mirror plots are named per feature at run time (ms2_<mode>_<id>).
+    # mirror plots get their names at run time, ms2_<mode>_<id>
     [[ "$stem" == ms2_* ]] && stem="ms2_%s_%d"
     grep -qF -- "$stem" scripts/*.R || { echo "NOT WRITTEN BY A SCRIPT: $fig"; status=1; }
 done < <(grep -oE 'figures/[A-Za-z0-9_./-]+\.png' README.md | sort -u)

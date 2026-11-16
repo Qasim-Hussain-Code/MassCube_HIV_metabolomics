@@ -1,18 +1,5 @@
 #!/usr/bin/env bash
-# Align one ion mode with MassCube once all of its files are processed:
-# run order, the retention time and drift rules, alignment with gap
-# filling, per-injection metrics, then deletion of the scan caches and
-# compression of the per-file tables so the other mode fits on disk.
-#
-# Usage: scripts/06_align_mode.sh --mode pos|neg [--force] [--help]
-#
-# Writes results/<mode>_run_order.tsv, <mode>_rt_rule.tsv,
-# <mode>_drift_rule.tsv, <mode>_injection_metrics.tsv and
-# <mode>_alignment_summary.tsv; fills injection_order and batch in
-# config/sample_table_<mode>.csv; may switch correct_rt and
-# signal_normalization on in config/masscube_parameters_<mode>.csv; and
-# leaves the aligned features in work/<mode>/project_files/.
-
+# Align one mode once all its files are done, then free its scan caches.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,7 +12,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --mode) MODE="$2"; shift 2 ;;
         --force) FORCE=1; shift ;;
-        --help|-h) sed -n '2,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) echo "usage: scripts/06_align_mode.sh --mode pos|neg [--force]"; exit 0 ;;
         *) echo "unknown argument: $1" >&2; exit 2 ;;
     esac
 done

@@ -1,35 +1,5 @@
-"""Build the MassCube sample tables from the deposited ISA-Tab.
-
-One table per ion mode, in MassCube's format: the first column is the raw
-file stem (MassCube matches it to the file), then is_qc and is_blank as
-"yes"/"no" strings. MassCube reads those two columns as booleans only
-when they are strings; a column of Python booleans is silently replaced
-by False, which would turn every QC into a study sample. The remaining
-columns are for this repository: group (PLWH, HC or QC), subgroup (the
-deposited disease factor: HC, INR, IR or QC), participant (the ISA
-sample name, shared by the two modes), isa_listed, and injection_order
-and batch, which stay empty here and are filled from the acquisition
-timestamps once every file of a mode has been converted.
-
-Labels come only from s_MTBLS9264.txt and the two assay tables. A file in
-the FILES/ listing that no assay table mentions is kept only if its name
-says it is a pooled QC and its polarity is then confirmed from its scans
-by the conversion stage; it is marked isa_listed = no.
-
-A file is linked to its participant through the assay table's Extract
-Name, not its Sample Name. In the positive assay table as deposited
-(revision 2), the Sample Name column is out of step with every other
-identifier column in all 114 rows: Extract Name, MS Assay Name, Derived
-Spectral Data File and Normalization Name all equal the raw file's stem,
-while Sample Name holds the same 114 names in another order, the ten QCs
-first. Read literally it would assign 40 files to the wrong group. The
-negative table is consistent in every column. The script checks those
-agreements on every run and writes them to
-results/isa_assay_consistency.tsv, so the evidence for the choice is
-rebuilt every time the tables are.
-
-Usage: python build_sample_tables.py --root ROOT
-"""
+#!/usr/bin/env python3
+# config/sample_table_{pos,neg}.csv from the deposited ISA-Tab only. Files link to participants by Extract Name, see below.
 
 from __future__ import annotations
 
@@ -92,6 +62,10 @@ def main() -> None:
         # Negative-mode files carry an "n" prefix that participant names do not.
         prefix = "n" if mode == "negative" else ""
 
+        # Positive table, revision 2: Sample Name is out of step with Extract Name, MS Assay Name,
+        # Derived Spectral Data File and Normalization Name in all 114 rows (QCs sorted first), and
+        # read literally it puts 40 files in the wrong group. The negative table agrees everywhere.
+        # Rechecked on every run -> results/isa_assay_consistency.tsv.
         def matches(r: dict, col: str) -> bool:
             file_id = stem(r["Raw Spectral Data File"]).removeprefix(prefix)
             value = r[col]
@@ -121,7 +95,7 @@ def main() -> None:
                 sys.exit(f"{raw}: participant {r['Extract Name']} is not in the study table")
             rows.append((raw, r["Extract Name"], sub, "yes"))
             seen.add(raw)
-        # Deposited but unlisted files of this mode: only pooled QCs are admitted.
+        # On FTP but in no assay table (QC11): admitted only as a QC, and 04 confirms its polarity from the scans
         for raw, r in listing.items():
             if r["mode"] == "unassigned" and raw not in seen:
                 name = stem(raw)
@@ -139,6 +113,8 @@ def main() -> None:
         tag = "pos" if mode == "positive" else "neg"
         out = os.path.join(a.root, "config", f"sample_table_{tag}.csv")
         with open(out, "w", encoding="utf-8", newline="\n") as fh:
+            # is_qc must be the strings yes/no: MassCube silently turns a bool column into all False.
+            # injection_order and batch stay empty until 06 fills them from the acquisition times.
             w = csv.writer(fh, lineterminator="\n")
             w.writerow(["sample_name", "is_qc", "is_blank", "group", "subgroup", "participant", "isa_listed",
                         "injection_order", "batch"])

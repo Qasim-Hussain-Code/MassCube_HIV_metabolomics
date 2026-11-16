@@ -1,18 +1,5 @@
-"""Run one command and record its elapsed time and peak resident memory.
-
-GNU time is not available on Windows, so two figures are taken and the
-larger is reported. The command's own peak is exact: on Windows the peak
-working set is read from its process handle after it exits, elsewhere the
-children's maximum resident set comes from getrusage. The whole process
-tree is also sampled, every 50 ms for the first two seconds and every half
-second after that, summing the resident set sizes of the command and all
-its descendants, because MassCube parallelises through loky worker
-processes that the command's own figure would not include.
-
-Usage: python measure.py --label NAME --log logs/measure.tsv -- command [args...]
-
-Appends one row to the log and exits with the command's exit code.
-"""
+#!/usr/bin/env python3
+# measure.py --label X --log logs/measure.tsv -- cmd ...: elapsed time and peak RSS, since GNU time has no Windows build
 
 from __future__ import annotations
 
@@ -41,7 +28,7 @@ def tree_rss(proc: psutil.Process) -> int:
 
 
 def own_peak_bytes(child: subprocess.Popen) -> int:
-    """Peak resident memory of the command itself, after it has exited."""
+    # Exact, unlike the sampling, which missed a 0.6 s run entirely (it read 2 MB).
     if os.name == "nt":
         import ctypes
         from ctypes import wintypes
@@ -75,6 +62,7 @@ def main() -> int:
     t0 = time.monotonic()
     child = subprocess.Popen(cmd)
     ps = psutil.Process(child.pid)
+    # The tree too: MassCube's loky workers aren't in the child's own peak.
     peak_tree = 0
     while child.poll() is None:
         peak_tree = max(peak_tree, tree_rss(ps))

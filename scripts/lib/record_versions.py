@@ -1,15 +1,5 @@
-"""Write the installed versions to config/.
-
-python_packages.tsv lists every distribution in the environment.
-tool_versions.tsv names the pieces a reader needs to reproduce the
-processing: MassCube and the wheel PyPI served for it, ms_entropy (the
-MassCube database was built with 1.3.4), ThermoRawFileParser, R, Python,
-and the newest version of the MassCube MS/MS database on Zenodo with its
-md5. The database itself is downloaded much later, by the annotation
-stage, which checks it against the md5 recorded here.
-
-Usage: python record_versions.py --root ROOT --trfp-version V --trfp-sha256 S --r-version "R ..."
-"""
+#!/usr/bin/env python3
+# config/python_packages.tsv and tool_versions.tsv. The database md5 noted here is what 07 checks its download against.
 
 from __future__ import annotations
 

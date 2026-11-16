@@ -1,19 +1,5 @@
-"""Fetch the MTBLS9264 ISA-Tab, assignment files, checksums and file list.
-
-Everything is read from the public FTP tree. The six metadata files are
-checked against the sha256 sums MetaboLights publishes in
-HASHES/metadata_sha256.json. The raw files are not downloaded here: each
-one is sized with a HEAD request and matched to the published sha256 in
-HASHES/data_sha256.json, and its ion mode is taken from the two ISA assay
-tables, not guessed from the file name.
-
-Usage: python fetch_metadata.py --root ROOT
-
-Writes data/metadata/ (untracked) and, tracked:
-  results/mtbls9264_files.tsv            one row per raw file: mode, bytes, sha256
-  results/mtbls9264_metadata_files.tsv   the metadata files and their checksum status
-  results/mtbls9264_study.tsv            study record as retrieved
-"""
+#!/usr/bin/env python3
+# MTBLS9264 metadata from the EBI FTP tree, checked against HASHES/; raw files are only sized (HEAD), not fetched.
 
 from __future__ import annotations
 
@@ -73,7 +59,7 @@ def main() -> None:
     meta_rows.append({"file": "study.json (MetaboLights web service)", "size_bytes": os.path.getsize(study_json),
                       "sha256": file_hash(study_json), "checked_against": "none published", "retrieved": now})
 
-    # Mode per raw file, from the assay tables.
+    # ion mode from the assay tables, not from the n prefix in the file names
     mode_of = {}
     for name in published_meta:
         if not name.startswith("a_"):
