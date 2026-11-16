@@ -1,0 +1,2 @@
+mode	pilot_files	reference_file	reference_features	matched_in_all_files	mz_range_median_da	mz_range_p99_da	limit_da	mz_tol_ms1_before	mz_tol_alignment_before	decision
+positive	6	QC11	200	157	0.0004999999999881766	0.018812000000011715	0.01	0.015	0.015	already widened
