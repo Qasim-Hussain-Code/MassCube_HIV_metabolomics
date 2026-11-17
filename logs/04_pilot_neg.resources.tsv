@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+04_pilot_neg	607	1033	7.57	7.78	6 files of this mode in the manifest	2026-11-17T15:55:20+0800

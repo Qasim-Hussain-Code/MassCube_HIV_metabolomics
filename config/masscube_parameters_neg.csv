@@ -9,13 +9,13 @@ centroid_mz_tol,0.002
 ms1_abs_int_tol,30000
 ms2_abs_int_tol,10000
 ms2_rel_int_tol,0
-mz_tol_ms1,0.01
+mz_tol_ms1,0.015
 mz_tol_ms2,0.015
 feature_gap_tol,10
 scan_scan_cor_tol,0.9
 mz_tol_feature_grouping,0.01
 rt_tol_feature_grouping,0.05
-mz_tol_alignment,0.01
+mz_tol_alignment,0.015
 rt_tol_alignment,0.2
 noise_tol,2
 gaussian_similarity_tol,0.7

@@ -117,8 +117,6 @@ def main() -> None:
     t0 = time.monotonic()
     features = feature_alignment(params.single_file_dir, params)
     t_align = time.monotonic() - t0
-    with open(os.path.join(params.project_file_dir, "aligned_features.pkl"), "wb") as fh:
-        pickle.dump(features, fh)
     with open(os.path.join(params.project_file_dir, "sample_metadata.pkl"), "wb") as fh:
         pickle.dump(params.sample_metadata, fh)
     ft = convert_features_to_df(features=features, sample_names=params.sample_metadata.iloc[:, 0], quant_method=params.quant_method)
@@ -132,7 +130,9 @@ def main() -> None:
     for f in features:
         f.isotope_signals = convert_signals_to_string(f.isotope_signals)
     t_group = time.monotonic() - t0
-    with open(os.path.join(params.project_file_dir, "aligned_features_grouped.pkl"), "wb") as fh:
+    # one gzipped copy, after grouping (positive: 1.14 GB to 0.24): the 3.3 GB database
+    # has to fit beside both modes' features under the 9.5 GB ceiling
+    with gzip.open(os.path.join(params.project_file_dir, "aligned_features_grouped.pkl.gz"), "wb", compresslevel=6) as fh:
         pickle.dump(features, fh)
 
     rows = []

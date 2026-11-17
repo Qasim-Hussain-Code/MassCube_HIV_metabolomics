@@ -1,0 +1,3 @@
+mode	pilot_files	reference_file	reference_features	matched_in_all_files	mz_range_median_da	mz_range_p99_da	limit_da	mz_tol_ms1_before	mz_tol_alignment_before	decision	evaluated
+negative	6	nHC2	200	184	0.0003000000000383	0.0235999999999876	0.01	0.01	0.01	widen to 0.015 Da and reprocess the pilot	2026-11-17T07:45:11Z
+negative	6	nHC2	200	184	0.0003000000000383807	0.02359999999998763	0.01	0.015	0.015	already widened	2026-11-17T07:55:24Z

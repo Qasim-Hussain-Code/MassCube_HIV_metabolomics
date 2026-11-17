@@ -117,7 +117,7 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     mode = MODES[tag]
     params = mode_params(root, tag)
     params.project_file_dir = work_files
-    with open(os.path.join(work_files, "aligned_features_grouped.pkl"), "rb") as fh:
+    with gzip.open(os.path.join(work_files, "aligned_features_grouped.pkl.gz"), "rb") as fh:
         features = pickle.load(fh)
     with open(os.path.join(work_files, "sample_metadata.pkl"), "rb") as fh:
         meta = pickle.load(fh).reset_index(drop=True)
@@ -144,7 +144,7 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     t0 = time.monotonic()
     features = annotate_aligned_features(features, params)
     t_annot = time.monotonic() - t0
-    with open(os.path.join(work_files, "aligned_features_annotated.pkl"), "wb") as fh:
+    with gzip.open(os.path.join(work_files, "aligned_features_annotated.pkl.gz"), "wb", compresslevel=6) as fh:
         pickle.dump(features, fh)
 
     ft = convert_features_to_df(features=features, sample_names=names, quant_method="peak_height")
@@ -230,6 +230,10 @@ def main() -> None:
     rss0, t0 = me.memory_info().rss, time.monotonic()
     loaded = {library: mca.load_ms2_db(library)}
     load_s, rss1 = time.monotonic() - t0, me.memory_info().rss
+    if not a.test:
+        # 3.3 GB, and load_once below serves both modes from memory, so it goes before any
+        # output is written; a rerun fetches it again
+        os.remove(library)
     es = loaded[library]
     from importlib.metadata import version
     pd.DataFrame([{"database": os.path.basename(library), "spectra": len(es.precursor_mz_array), "load_s": round(load_s, 1),
@@ -251,8 +255,6 @@ def main() -> None:
         work_files = os.path.join(root, "work", tag, "test" if a.test else "project_files")
         out = work_files if a.test else os.path.join(root, "results")
         annotate_mode(root, tag, library, drug_msp, out, work_files)
-    if not a.test:
-        os.remove(library)  # 3.3 GB; a rerun fetches it again
 
 
 if __name__ == "__main__":

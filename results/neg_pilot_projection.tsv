@@ -1,0 +1,2 @@
+mode	pilot_files	mode_files	mean_download_s	pilot_download_mb_per_s	mean_convert_s	mean_masscube_s	max_peak_rss_mb	mean_single_file_mb	mean_mzpkl_mb	max_mzml_mb	max_raw_mb	projected_processing_h	projected_download_h_at_pilot_rate	project_gb_now	projected_peak_gb	ceiling_gb
+negative	6	114			13.1667	82.0	882	23.7101	12.7767	145.1682	297.513	3.0136		7.7802	10.3755	9.5
