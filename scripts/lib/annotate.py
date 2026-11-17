@@ -25,6 +25,11 @@ from mc_common import MODES, mode_params, read_conf  # noqa: E402
 
 GNPS_RECORD = "17232042"
 GNPS_SPECTRA = "GNPS_Drug_Library_Spectra_Drugs_and_Metabolites.mgf"
+GNPS_META = "GNPS_Drug_Library_Metadata_Drugs.csv"
+# (label, molecules, mass added). The names can't be trusted for this: some "M+H" records sit at [2M+Na]+
+ADDUCTS = [("[M+H]+", 1, 1.007276), ("[M+Na]+", 1, 22.989218), ("[M+NH4]+", 1, 18.033823), ("[M+K]+", 1, 38.963158),
+           ("[M+H-H2O]+", 1, -17.003289), ("[2M+H]+", 2, 1.007276), ("[2M+Na]+", 2, 22.989218),
+           ("[M-H]-", 1, -1.007276), ("[M+Cl]-", 1, 34.969402), ("[M+FA-H]-", 1, 44.998201), ("[2M-H]-", 2, -1.007276)]
 SLIM_DROP = ["MS2", "matched_MS2", "peak_shape", "isotopes"]
 
 
@@ -54,40 +59,52 @@ def fetch_database(root: str, conf: dict) -> str:
 def drug_library(root: str, conf: dict) -> tuple[str, pd.DataFrame]:
     # Written as MSP: MassCube 1.2.22 has no index_msp_to_pkl, and load_ms2_db indexes an MSP
     # in memory with the same unweighted entropy as the main database (deviation 3).
-    # TODO(qasim): the MGF field names below (inchikey, ionmode, pepmass, adduct, spectrumid)
-    # were never checked against the real file; look at its first record before trusting the subset.
+    # The MGF has no INCHIKEY, ADDUCT or FORMULA field, only INCHI and SMILES (often N/A) and a
+    # free-text NAME, so the InChIKey comes from the record's metadata CSV (gnps_libid = SPECTRUMID).
     from pyteomics import mgf
     from record_versions import fetch_json
 
     drugs = pd.read_csv(os.path.join(root, "config", "antiretrovirals.tsv"), sep="\t")
     first = {k.split("-")[0]: d for k, d in zip(drugs["inchikey"], drugs["drug"]) if isinstance(k, str) and k != "NA"}
+    info = drugs.set_index("drug")
     rec = fetch_json(f"https://zenodo.org/api/records/{GNPS_RECORD}")
-    f = [x for x in rec["files"] if x["key"] == GNPS_SPECTRA][0]
-    src = os.path.join(root, "data", "db", GNPS_SPECTRA)
-    if not os.path.exists(src):
-        check_space(root, conf, int(f["size"]))
-    download(f"https://zenodo.org/api/records/{GNPS_RECORD}/files/{GNPS_SPECTRA}/content", src,
-             size=int(f["size"]), md5=f["checksum"].split(":", 1)[1], connections=4)
+    files = {x["key"]: x for x in rec["files"]}
+    local = {}
+    for name in (GNPS_SPECTRA, GNPS_META):
+        dest = os.path.join(root, "data", "db", name)
+        if not os.path.exists(dest):
+            check_space(root, conf, int(files[name]["size"]))
+        download(f"https://zenodo.org/api/records/{GNPS_RECORD}/files/{name}/content", dest,
+                 size=int(files[name]["size"]), md5=files[name]["checksum"].split(":", 1)[1], connections=4)
+        local[name] = dest
+    meta = pd.read_csv(local[GNPS_META], usecols=["gnps_libid", "inchikey"], dtype=str).dropna()
+    key_of = dict(zip(meta["gnps_libid"], meta["inchikey"]))
 
     out = os.path.join(root, "data", "db", "antiretrovirals_gnps.msp")
     kept = []
-    with mgf.read(src, use_index=False, convert_arrays=1) as reader, open(out, "w", encoding="utf-8", newline="\n") as msp:
+    with mgf.read(local[GNPS_SPECTRA], use_index=False, convert_arrays=1) as reader, \
+            open(out, "w", encoding="utf-8", newline="\n") as msp:
         for s in reader:
             p = {k.lower(): v for k, v in s["params"].items()}
-            key = str(p.get("inchikey", "")).split("-")[0].upper()
-            if key not in first:
+            sid = str(p.get("spectrumid", ""))
+            key = key_of.get(sid, "")
+            drug = first.get(key.split("-")[0].upper())
+            if drug is None:
                 continue
             mode = str(p.get("ionmode", "")).capitalize()
-            prec = p.get("pepmass", (None,))[0] if isinstance(p.get("pepmass"), tuple) else p.get("pepmass")
-            msp.write(f"NAME: {first[key]}\nPRECURSORMZ: {prec}\nPRECURSORTYPE: {p.get('adduct', '')}\n"
-                      f"IONMODE: {mode}\nINCHIKEY: {p.get('inchikey', '')}\nFORMULA: {p.get('formula', '')}\n"
-                      f"COMMENT: GNPS Drug Library {p.get('spectrumid', p.get('title', ''))}\n"
+            prec = float(p["pepmass"][0] if isinstance(p.get("pepmass"), tuple) else p["pepmass"])
+            mass = float(info.loc[drug, "monoisotopic_mass"])
+            adduct = next((a for a, n, d in ADDUCTS if abs(prec - n * mass - d) < 0.02), "")
+            msp.write(f"NAME: {drug}\nPRECURSORMZ: {prec}\nPRECURSORTYPE: {adduct}\n"
+                      f"IONMODE: {mode}\nINCHIKEY: {key}\nFORMULA: {info.loc[drug, 'formula']}\n"
+                      f"COMMENT: GNPS Drug Library {sid}\n"
                       f"Num Peaks: {len(s['m/z array'])}\n")
             for mz, it in zip(s["m/z array"], s["intensity array"]):
                 msp.write(f"{mz:.5f}\t{it:.1f}\n")
             msp.write("\n")
-            kept.append({"drug": first[key], "ion_mode": mode, "adduct": p.get("adduct", ""), "precursor_mz": prec})
-    os.remove(src)  # 338 MB, and only the subset is needed
+            kept.append({"drug": drug, "ion_mode": mode, "adduct": adduct, "precursor_mz": prec})
+    for path in local.values():
+        os.remove(path)  # 338 + 22 MB, and only the subset is needed
     summary = (pd.DataFrame(kept, columns=["drug", "ion_mode", "adduct", "precursor_mz"])
                .groupby(["drug", "ion_mode"]).size().rename("spectra").reset_index())
     summary = drugs[["drug", "class"]].merge(summary, on="drug", how="left").fillna({"spectra": 0})
