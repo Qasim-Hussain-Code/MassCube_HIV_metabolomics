@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+04_process_pos	18115	1458	2.79	7.16	115 files of this mode in the manifest	2026-11-17T05:48:22+0800

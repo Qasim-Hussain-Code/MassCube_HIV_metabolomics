@@ -1,0 +1,2 @@
+mode	usable_qcs	min_qcs	qc_before_first_sample	qc_after_last_sample	longest_study_run_without_qc	max_run	lowess
+positive	11	8	False	True	52	20	False

@@ -1,0 +1,2 @@
+mode	qcs_used	reference_qc	matched_in_all_qcs	rt_range_median_min	rt_range_p95_min	limit_min	correct_rt
+positive	11	QC5	200	0.2054999999999998	0.6319999999999997	0.05	True

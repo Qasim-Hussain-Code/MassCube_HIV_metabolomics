@@ -20,7 +20,7 @@ rt_tol_alignment,0.2
 noise_tol,2
 gaussian_similarity_tol,0.7
 rt_tol_rt_correction,0.5
-correct_rt,false
+correct_rt,true
 scan_number_cutoff,5
 detection_rate_cutoff,0.1
 merge_features,true
