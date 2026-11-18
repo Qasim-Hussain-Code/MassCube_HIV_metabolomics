@@ -25,6 +25,10 @@ from mc_common import MODES  # noqa: E402
 MIN_MEMBERS = 3
 
 
+class Refused(Exception):
+    pass
+
+
 def get(url: str, tries: int = 5) -> str:
     last = None
     for i in range(tries):
@@ -35,6 +39,8 @@ def get(url: str, tries: int = 5) -> str:
             # 404 is "nothing found"; 400 is KEGG refusing a name it can't search, which no retry fixes
             if e.code in (400, 404):
                 return ""
+            if e.code == 403:
+                raise Refused(url) from e
             last = e
         except OSError as e:
             last = e
@@ -54,15 +60,21 @@ def bh(p: np.ndarray) -> np.ndarray:
     return out
 
 
-def kegg_by_name(name: str) -> str:
+def kegg_by_name(name: str) -> tuple[str, str]:
     # only when exactly one KEGG compound carries the name
     if not isinstance(name, str) or not name.strip():
-        return ""
-    # safe="": a slash left bare ("Cer 14:1;2O/16:0") reads to KEGG as a find option and gets a 400
-    txt = get(f"https://rest.kegg.jp/find/compound/{urllib.parse.quote(name.replace(',', ' '), safe='')}")
+        return "", "no KEGG identifier found"
+    try:
+        # safe="": a slash left bare ("Cer 14:1;2O/16:0") reads to KEGG as a find option and gets a 400
+        txt = get(f"https://rest.kegg.jp/find/compound/{urllib.parse.quote(name.replace(',', ' '), safe='')}")
+    except Refused:
+        # KEGG answers some names with 403, e.g. any with "? " in it (the database has "?" where
+        # superscript locants were lost). A real block refuses this one too and stops the run.
+        get("https://rest.kegg.jp/list/cpd:C00001")
+        return "", "KEGG refused the name search (HTTP 403)"
     hits = [l.split("\t")[0].replace("cpd:", "") for l in txt.splitlines()
             if l and name.strip().lower() in [n.strip().lower() for n in l.split("\t", 1)[1].split(";")]]
-    return hits[0] if len(hits) == 1 else ""
+    return (hits[0], "KEGG exact name match") if len(hits) == 1 else ("", "no KEGG identifier found")
 
 
 def kegg_ids(pairs: list[tuple[str, str]], cache_path: str) -> pd.DataFrame:
@@ -72,28 +84,30 @@ def kegg_ids(pairs: list[tuple[str, str]], cache_path: str) -> pd.DataFrame:
     today = datetime.date.today().isoformat()
     # KEGG's conv/ maps PubChem SIDs, not CIDs, so the C numbers come from PubChem's synonyms (deviation 4)
     new = []
-    for k, name in pairs:
-        if k in known:
-            continue
-        txt = get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{urllib.parse.quote(k)}/synonyms/JSON")
-        cands = []
-        if txt:
-            for info in json.loads(txt).get("InformationList", {}).get("Information", []):
-                cands += [s for s in info.get("Synonym", []) if re.fullmatch(r"C\d{5}", s)]
-        kid = ""
-        for c in dict.fromkeys(cands):
-            if get(f"https://rest.kegg.jp/list/cpd:{c}").strip():
-                kid = c
-                break
-        source = "PubChem synonyms, confirmed in KEGG" if kid else ""
-        if not kid:
-            # synonyms are per CID, and the C number can sit on a stereo variant's CID instead
-            kid = kegg_by_name(name)
-            source = "KEGG exact name match" if kid else "no KEGG identifier found"
-        new.append({"inchikey": k, "kegg_id": kid, "source": source, "retrieved": today})
-    if new:
-        cache = pd.concat([cache, pd.DataFrame(new)], ignore_index=True)
-        cache.to_csv(cache_path, sep="\t", index=False)
+    try:
+        for k, name in pairs:
+            if k in known:
+                continue
+            txt = get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{urllib.parse.quote(k)}/synonyms/JSON")
+            cands = []
+            if txt:
+                for info in json.loads(txt).get("InformationList", {}).get("Information", []):
+                    cands += [s for s in info.get("Synonym", []) if re.fullmatch(r"C\d{5}", s)]
+            kid = ""
+            for c in dict.fromkeys(cands):
+                if get(f"https://rest.kegg.jp/list/cpd:{c}").strip():
+                    kid = c
+                    break
+            source = "PubChem synonyms, confirmed in KEGG" if kid else ""
+            if not kid:
+                # synonyms are per CID, and the C number can sit on a stereo variant's CID instead
+                kid, source = kegg_by_name(name)
+            new.append({"inchikey": k, "kegg_id": kid, "source": source, "retrieved": today})
+    finally:
+        # kept when a lookup fails too, so the rerun starts where this one stopped
+        if new:
+            cache = pd.concat([cache, pd.DataFrame(new)], ignore_index=True)
+            cache.to_csv(cache_path, sep="\t", index=False)
     return cache
 
 
