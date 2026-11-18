@@ -32,7 +32,8 @@ def get(url: str, tries: int = 5) -> str:
             with urllib.request.urlopen(url, timeout=120) as r:
                 return r.read().decode("utf-8")
         except urllib.error.HTTPError as e:
-            if e.code == 404:
+            # 404 is "nothing found"; 400 is KEGG refusing a name it can't search, which no retry fixes
+            if e.code in (400, 404):
                 return ""
             last = e
         except OSError as e:
@@ -57,7 +58,8 @@ def kegg_by_name(name: str) -> str:
     # only when exactly one KEGG compound carries the name
     if not isinstance(name, str) or not name.strip():
         return ""
-    txt = get(f"https://rest.kegg.jp/find/compound/{urllib.parse.quote(name.replace(',', ' '))}")
+    # safe="": a slash left bare ("Cer 14:1;2O/16:0") reads to KEGG as a find option and gets a 400
+    txt = get(f"https://rest.kegg.jp/find/compound/{urllib.parse.quote(name.replace(',', ' '), safe='')}")
     hits = [l.split("\t")[0].replace("cpd:", "") for l in txt.splitlines()
             if l and name.strip().lower() in [n.strip().lower() for n in l.split("\t", 1)[1].split(";")]]
     return hits[0] if len(hits) == 1 else ""

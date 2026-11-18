@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Both modes against the MassCube MS/MS database and the GNPS antiretroviral spectra, then
 # LOWESS (if 06 switched it on) and PQN. Prereg sections 8 and 9.
-# --test --library x.msp: work/pos/test/ against a local library, no downloads.
+# --test --library x.msp: work/pos/test/ against a local library, no downloads. --tables-only: LOWESS and PQN again.
 
 from __future__ import annotations
 
@@ -128,7 +128,6 @@ def level_of(f) -> int:
 def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: str, work_files: str) -> None:
     from masscube.alignment import convert_features_to_df, output_feature_table, output_feature_to_msp
     from masscube.annotation import annotate_aligned_features
-    from masscube.normalization import sample_normalization, signal_normalization
     from masscube.visualization import plot_ms2_matching_from_feature_table
 
     mode = MODES[tag]
@@ -194,32 +193,50 @@ def annotate_mode(root: str, tag: str, library: str, drug_msp: str | None, out: 
     if os.path.getsize(os.path.join(out, f"{tag}_features.msp.gz")) > 20 * 1024**2:
         os.remove(os.path.join(out, f"{tag}_features.msp.gz"))  # too big to track; stays in work/
 
-    # conditioning QCs out of the normalisation
-    keep = ~meta["conditioning_qc"].astype(bool)
-    meta_n = meta[keep].reset_index(drop=True)
-    dropped = list(meta.loc[~keep, meta.columns[0]])
-    def normalise(t: pd.DataFrame, lowess: bool) -> pd.DataFrame:
-        t = t.drop(columns=dropped)
-        if lowess:
-            t = signal_normalization(t, meta_n, params.signal_norm_method)
-        if params.sample_normalization:
-            t = sample_normalization(t, meta_n, params.sample_norm_method)
-        return t[["feature_ID"] + list(meta_n.iloc[:, 0])]
-
-    for quant in ("peak_height", "peak_area"):
-        t = convert_features_to_df(features=features, sample_names=names, quant_method=quant)
-        t[["feature_ID"] + names].to_csv(os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_raw.tsv.gz"), sep="\t", index=False)
-        normalise(t, params.signal_normalization).to_csv(
-            os.path.join(out, f"{tag}_{quant.replace('peak_', '')}_normalised.tsv.gz"), sep="\t", index=False)
-    # the other LOWESS choice too, for the sensitivity analysis; LOWESS won't run on fewer than 3 QCs
-    if int(meta_n["is_qc"].sum()) >= 3:
-        t = convert_features_to_df(features=features, sample_names=names, quant_method="peak_height")
-        normalise(t, not params.signal_normalization).to_csv(
-            os.path.join(out, f"{tag}_height_normalised_{'without' if params.signal_normalization else 'with'}_lowess.tsv.gz"),
-            sep="\t", index=False)
+    for quant in ("height", "area"):
+        t = convert_features_to_df(features=features, sample_names=names, quant_method=f"peak_{quant}")
+        t[["feature_ID"] + names].to_csv(os.path.join(out, f"{tag}_{quant}_raw.tsv.gz"), sep="\t", index=False)
+    write_normalised(tag, params, meta, out)
     print(f"{mode}: {len(features)} features annotated in {t_annot:.0f} s; level 2: {sum(v == 2 for v in levels.values())}, "
           f"level 3: {sum(v == 3 for v in levels.values())}; drug hits: {len(drug_rows)}; "
           f"LOWESS {'on' if params.signal_normalization else 'off'}")
+
+
+def pqn(t: pd.DataFrame, meta: pd.DataFrame, method: str) -> pd.DataFrame:
+    # MassCube's sample_normalization minus its blank test. 1.2.22 runs that test with no blanks too:
+    # the blank mean is over no columns, so NaN, every feature fails, every factor comes out NaN and
+    # the int64 cast turns every value into -2**63 (what the first run wrote)
+    from masscube.normalization import find_normalization_factors, high_quality_feature_selection, sample_normalization_by_factors
+    cols = list(meta.iloc[:, 0])
+    data = t[cols].to_numpy(copy=True)
+    v = find_normalization_factors(high_quality_feature_selection(data, is_qc=meta["is_qc"].to_numpy(bool)), method=method)
+    if not np.all(np.isfinite(v)):
+        sys.exit(f"PQN factor not finite for {', '.join(c for c, x in zip(cols, v) if not np.isfinite(x))}")
+    t[cols] = sample_normalization_by_factors(data, v)
+    return t
+
+
+def write_normalised(tag: str, params, meta: pd.DataFrame, out: str) -> None:
+    # from the raw tables on disk (MassCube writes whole numbers), so --tables-only gives the same values
+    from masscube.normalization import signal_normalization
+    meta_n = meta[~meta["conditioning_qc"].astype(bool)].reset_index(drop=True)  # conditioning QCs left out
+    cols = ["feature_ID"] + list(meta_n.iloc[:, 0])
+
+    def normalise(quant: str, lowess: bool) -> pd.DataFrame:
+        t = pd.read_csv(os.path.join(out, f"{tag}_{quant}_raw.tsv.gz"), sep="\t")[cols]
+        if lowess:
+            t = signal_normalization(t, meta_n, params.signal_norm_method)
+        if params.sample_normalization:
+            t = pqn(t, meta_n, params.sample_norm_method)
+        return t
+
+    for quant in ("height", "area"):
+        normalise(quant, params.signal_normalization).to_csv(os.path.join(out, f"{tag}_{quant}_normalised.tsv.gz"), sep="\t", index=False)
+    # the other LOWESS choice too, for the sensitivity analysis; LOWESS won't run on fewer than 3 QCs
+    if int(meta_n["is_qc"].sum()) >= 3:
+        normalise("height", not params.signal_normalization).to_csv(
+            os.path.join(out, f"{tag}_height_normalised_{'without' if params.signal_normalization else 'with'}_lowess.tsv.gz"),
+            sep="\t", index=False)
 
 
 def main() -> None:
@@ -227,9 +244,18 @@ def main() -> None:
     ap.add_argument("--root", required=True)
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--library", help="local MSP or pickle used instead of the downloads (--test)")
+    ap.add_argument("--tables-only", action="store_true", help="redo LOWESS and PQN from the raw tables; no database")
     a = ap.parse_args()
     root = a.root
     conf = read_conf(root)
+
+    if a.tables_only:
+        for tag in MODES:
+            with open(os.path.join(root, "work", tag, "project_files", "sample_metadata.pkl"), "rb") as fh:
+                meta = pickle.load(fh).reset_index(drop=True)
+            write_normalised(tag, mode_params(root, tag), meta, os.path.join(root, "results"))
+            print(f"{MODES[tag]}: normalised tables written again from the raw ones")
+        return
 
     import masscube.annotation as mca
 

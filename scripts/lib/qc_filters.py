@@ -141,6 +141,9 @@ def main() -> None:
                             "median_order_hc": h_o.median(), "U": w.statistic, "p": w.pvalue, "associated": w.pvalue < 0.05})
 
         height = pd.read_csv(os.path.join(res, f"{tag}_height_normalised.tsv.gz"), sep="\t")
+        if (height.drop(columns="feature_ID").to_numpy() < 0).any():
+            # a NaN PQN factor cast to int64, as the first run of 07 wrote; the filters would pass nothing
+            sys.exit(f"{tag}_height_normalised.tsv.gz has negative heights; run annotate.py --tables-only first")
         detected = pd.read_csv(os.path.join(res, f"{tag}_detected.tsv.gz"), sep="\t")
         ann = pd.read_csv(os.path.join(res, f"{tag}_annotation.tsv.gz"), sep="\t")
         usable_qc = list(order.loc[order["is_qc"].astype(bool) & ~order["conditioning_qc"].astype(bool), "sample_name"])
