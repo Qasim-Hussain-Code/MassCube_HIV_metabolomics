@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+10_pathways	786	139	7.12	7.12	scripts/lib/pathways.py	2026-11-18T12:17:50+0800

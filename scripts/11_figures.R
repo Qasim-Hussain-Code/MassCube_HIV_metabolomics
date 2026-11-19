@@ -6,6 +6,9 @@ suppressPackageStartupMessages({
     library("ggplot2")
     library("patchwork")
 })
+## intensities are whole numbers, and fread reads a column with any value past 2^31 as integer64,
+## which needs bit64; without it the QC RSDs in fig 2 came out as 0% and over 100%
+options(datatable.integer64 = "double")
 root <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE))), ".."), winslash = "/")
 args <- commandArgs(trailingOnly = TRUE)
 base <- if (length(args) && args[1] == "--root") args[2] else root
@@ -69,15 +72,19 @@ for (tg in names(modes)) {
 }
 r <- rbindlist(rsd_rows)
 med <- r[, .(median = median(rsd, na.rm = TRUE), n = .N), by = .(mode, lowess)]
+## one caption line per mode; the four on one line ran off the page
+cap <- med[, sprintf("%s, %d features: median %s", mode, n[1], paste(sprintf("%.1f%% %s", median, lowess), collapse = ", ")), by = mode]$V1
 p2 <- ggplot(r, aes(rsd, colour = lowess)) + stat_ecdf() + geom_vline(xintercept = 30, linetype = 2, colour = "grey40") +
     facet_wrap(~ mode) + coord_cartesian(xlim = c(0, 100)) +
     scale_colour_manual(values = c(`LOWESS on` = "#009E73", `LOWESS off` = "#000000")) +
     labs(x = "QC relative standard deviation (%)", y = "cumulative fraction of features", colour = NULL,
-         caption = paste(sprintf("%s, %s: median %.1f%% over %d features", med$mode, med$lowess, med$median, med$n), collapse = "; "))
+         caption = paste(cap, collapse = "\n"))
 save_fig(p2, "fig2_qc_rsd", 8, 3.6)
 
 ## ---- Figure 3: volcano plots --------------------------------------------------------
 
+## n_hc and n_plwh in the limma tables count each feature's non-missing values, so the group sizes come from here
+tc <- fread(res("test_counts.tsv"))[analysis == "primary limma"]
 vols <- list()
 for (tg in names(modes)) {
     d <- fread(res(sprintf("%s_limma.tsv.gz", tg)))
@@ -88,7 +95,8 @@ for (tg in names(modes)) {
         scale_colour_manual(values = level_col, drop = FALSE, labels = c(`2` = "level 2", `3` = "level 3", `4` = "level 4")) +
         labs(x = "log2 fold change, PLWH over HC", y = "-log10 p (limma)", colour = "annotation",
              title = sprintf("%s mode: %d features tested, %d at q < 0.05", modes[[tg]], nrow(d), d[q < 0.05, .N]),
-             caption = sprintf("HC n = %d, PLWH n = %d; dashed line: q = 0.05", d$n_hc[1], d$n_plwh[1]))
+             caption = sprintf("HC n = %d, PLWH n = %d; dashed line: q = 0.05",
+                               tc[mode == modes[[tg]], n_reference], tc[mode == modes[[tg]], n_comparison]))
 }
 save_fig(wrap_plots(vols, ncol = 2), "fig3_volcano", 9, 4)
 

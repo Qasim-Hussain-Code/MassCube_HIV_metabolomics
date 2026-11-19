@@ -1,0 +1,26 @@
+drug	class	ion_mode	spectra
+tenofovir	NRTI	Negative	9.0
+tenofovir	NRTI	Positive	37.0
+tenofovir disoproxil	NRTI prodrug	Positive	16.0
+tenofovir alafenamide	NRTI prodrug	Positive	13.0
+emtricitabine	NRTI	Negative	14.0
+emtricitabine	NRTI	Positive	22.0
+lamivudine	NRTI	Positive	8.0
+zidovudine	NRTI	Negative	11.0
+zidovudine	NRTI	Positive	12.0
+abacavir	NRTI	Positive	17.0
+azvudine	NRTI	Positive	5.0
+efavirenz	NNRTI	Negative	17.0
+efavirenz	NNRTI	Positive	24.0
+rilpivirine	NNRTI	Positive	5.0
+nevirapine	NNRTI	Positive	28.0
+ainuovirine	NNRTI		0.0
+dolutegravir	integrase inhibitor	Positive	13.0
+bictegravir	integrase inhibitor	Positive	1.0
+raltegravir	integrase inhibitor	Positive	12.0
+elvitegravir	integrase inhibitor	Positive	20.0
+lopinavir	protease inhibitor	Positive	17.0
+ritonavir	protease inhibitor	Positive	43.0
+darunavir	protease inhibitor	Negative	13.0
+darunavir	protease inhibitor	Positive	41.0
+cobicistat	pharmacokinetic booster	Positive	8.0

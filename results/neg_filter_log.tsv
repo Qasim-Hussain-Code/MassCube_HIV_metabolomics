@@ -1,0 +1,6 @@
+step	features_before	features_after	removed	criterion	why
+detection by group	67624	10385	57239	detected before gap filling in at least 50% of HC or of PLWH	a feature seen in too few samples of either group cannot be compared; independent of the group difference
+QC detection	10385	6732	3653	detected before gap filling in more than 70% of usable QCs	precision cannot be measured for a feature the pooled QC does not show (Broadhurst et al. 2018)
+QC RSD	6732	3853	2879	relative standard deviation of normalised QC heights at most 30%	technical imprecision too large for the feature to be trusted
+D-ratio	3853	3509	344	SD of log2 QC values over SD of log2 study values at most 50%	technical variance too close to the total variance to carry biological information
+blank filter	3509	3509	0	not applied	no blanks were deposited

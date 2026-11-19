@@ -6,7 +6,7 @@ out_tsv <- args[1]
 out_session <- args[2]
 
 ## R.utils because fread won't open .gz without it
-pkgs <- c("limma", "ropls", "vegan", "data.table", "ggplot2", "ggrepel",
+pkgs <- c("limma", "vegan", "data.table", "ggplot2", "ggrepel",
           "patchwork", "jsonlite", "statmod", "R.utils")
 
 repos <- "https://cloud.r-project.org"

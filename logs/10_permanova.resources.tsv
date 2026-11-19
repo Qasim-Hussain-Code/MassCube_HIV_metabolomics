@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+10_permanova	13	280	7.12	7.12	scripts/10_permanova.R	2026-11-19T00:14:42+0800

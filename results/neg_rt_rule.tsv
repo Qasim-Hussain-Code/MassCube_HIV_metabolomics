@@ -1,0 +1,2 @@
+mode	qcs_used	reference_qc	matched_in_all_qcs	rt_range_median_min	rt_range_p95_min	limit_min	correct_rt
+negative	9	nQC2	199	0.29300000000000104	0.5759999999999987	0.05	True

@@ -1,0 +1,49 @@
+pathway	background_members	significant_members	background_size	significant_size	p	members	q	name	in_hsa
+map04976	7	7	76	26	0.0003008888433911536	C00315;C00486;C00695;C01921;C03990;C04483;C05466	0.014442664482775373	Bile secretion	True
+map00121	7	6	76	26	0.005566443602736342	C00695;C01921;C03990;C04483;C05466;C17726	0.1335946464656722	Secondary bile acid biosynthesis	False
+map00120	3	3	76	26	0.03698435277382645	C00695;C01921;C05466	0.5917496443812232	Primary bile acid biosynthesis	True
+map00630	3	2	76	26	0.26813655761024185	C00049;C00064	1.0	Glyoxylate and dicarboxylate metabolism	True
+map02020	3	2	76	26	0.26813655761024185	C00049;C00064	1.0	Two-component system	False
+map00410	3	2	76	26	0.26813655761024185	C00049;C00315	1.0	beta-Alanine metabolism	True
+map00330	3	2	76	26	0.26813655761024185	C00315;C01157	1.0	Arginine and proline metabolism	True
+map00998	4	2	76	26	0.42329351702098633	C00049;C01179	1.0	Biosynthesis of various antibiotics	False
+map00250	4	2	76	26	0.42329351702098633	C00049;C00064	1.0	Alanine, aspartate and glutamate metabolism	True
+map00261	4	2	76	26	0.42329351702098633	C00049;C01179	1.0	Monobactam biosynthesis	False
+map00470	7	3	76	26	0.45034972724687067	C00049;C00064;C01157	1.0	D-Amino acid metabolism	True
+map02060	5	2	76	26	0.5612108142749817	C02713;C16488	1.0	Phosphotransferase system (PTS)	False
+map00220	5	2	76	26	0.5612108142749817	C00049;C00064	1.0	Arginine biosynthesis	True
+map01060	12	4	76	26	0.6471802909713749	C00049;C00064;C01179;C01595	1.0	Biosynthesis of plant secondary metabolites	False
+map01240	9	3	76	26	0.6565743652617924	C00049;C00064;C01179	1.0	Biosynthesis of cofactors	True
+map00970	6	2	76	26	0.6753325215098015	C00049;C00064	1.0	Aminoacyl-tRNA biosynthesis	True
+map01120	6	2	76	26	0.6753325215098015	C00049;C00064	1.0	Microbial metabolism in diverse environments	False
+map05230	6	2	76	26	0.6753325215098015	C00049;C00064	1.0	Central carbon metabolism in cancer	True
+map00600	3	1	76	26	0.7211948790896159	C00836	1.0	Sphingolipid metabolism	True
+map00130	3	1	76	26	0.7211948790896159	C01179	1.0	Ubiquinone and other terpenoid-quinone biosynthesis	True
+map04080	3	1	76	26	0.7211948790896159	C00049	1.0	Neuroactive ligand-receptor interaction	True
+map00260	3	1	76	26	0.7211948790896159	C00049	1.0	Glycine, serine and threonine metabolism	True
+map00270	3	1	76	26	0.7211948790896159	C00049	1.0	Cysteine and methionine metabolism	True
+map01232	3	1	76	26	0.7211948790896159	C00064	1.0	Nucleotide metabolism	True
+map00340	3	1	76	26	0.7211948790896159	C00049	1.0	Histidine metabolism	True
+map00460	3	1	76	26	0.7211948790896159	C00049	1.0	Cyanoamino acid metabolism	False
+map00350	3	1	76	26	0.7211948790896159	C01179	1.0	Tyrosine metabolism	True
+map00975	3	1	76	26	0.7211948790896159	C00315	1.0	Biosynthesis of various siderophores	False
+map00950	3	1	76	26	0.7211948790896159	C01179	1.0	Isoquinoline alkaloid biosynthesis	False
+map01230	11	3	76	26	0.8046677845185767	C00049;C00064;C01179	1.0	Biosynthesis of amino acids	True
+map00400	4	1	76	26	0.8204953331124925	C01179	1.0	Phenylalanine, tyrosine and tryptophan biosynthesis	True
+map00240	4	1	76	26	0.8204953331124925	C00064	1.0	Pyrimidine metabolism	True
+map04978	4	1	76	26	0.8204953331124925	C00064	1.0	Mineral absorption	True
+map00999	4	1	76	26	0.8204953331124925	C00049	1.0	Biosynthesis of various plant secondary metabolites	False
+map00360	4	1	76	26	0.8204953331124925	C03519	1.0	Phenylalanine metabolism	True
+map01064	4	1	76	26	0.8204953331124925	C00049	1.0	Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid	False
+map01210	8	2	76	26	0.8337986635558657	C00049;C01179	1.0	2-Oxocarboxylic acid metabolism	True
+map04974	8	2	76	26	0.8337986635558657	C00049;C00064	1.0	Protein digestion and absorption	True
+map02010	15	4	76	26	0.8389100707565083	C00049;C00064;C00315;C01157	1.0	ABC transporters	True
+map00997	5	1	76	26	0.8853164628218702	C00049	1.0	Biosynthesis of various other secondary metabolites	False
+map01070	5	1	76	26	0.8853164628218702	C00049	1.0	Biosynthesis of plant hormones	False
+map01063	6	1	76	26	0.927313251084284	C01179	1.0	Biosynthesis of alkaloids derived from shikimate pathway	False
+map00940	7	1	76	26	0.9543111863958356	C00315	1.0	Phenylpropanoid biosynthesis	False
+map01100	47	13	76	26	0.9620233900454076	C00049;C00064;C00315;C00486;C00695;C00836;C01157;C01179;C01595;C01904;C01921;C02713;C03519	1.0	Metabolic pathways	True
+map01110	24	5	76	26	0.975809696434923	C00049;C00064;C00315;C00486;C01179	1.0	Biosynthesis of secondary metabolites	False
+map00996	5	0	76	26	1.0		1.0	Biosynthesis of various alkaloids	False
+map00380	3	0	76	26	1.0		1.0	Tryptophan metabolism	True
+map01061	8	0	76	26	1.0		1.0	Biosynthesis of phenylpropanoids	False

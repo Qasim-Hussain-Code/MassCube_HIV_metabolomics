@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+07_annotate	26426	5919	5.31	7.01	2706405 spectra, loaded in 22.7 s, +3174 MB	2026-11-18T11:37:21+0800

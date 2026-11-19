@@ -1,0 +1,589 @@
+pathway	name	in_hsa	retrieved
+map01100	Metabolic pathways	True	2026-11-18
+map01110	Biosynthesis of secondary metabolites	False	2026-11-18
+map01120	Microbial metabolism in diverse environments	False	2026-11-18
+map01200	Carbon metabolism	True	2026-11-18
+map01210	2-Oxocarboxylic acid metabolism	True	2026-11-18
+map01212	Fatty acid metabolism	True	2026-11-18
+map01230	Biosynthesis of amino acids	True	2026-11-18
+map01232	Nucleotide metabolism	True	2026-11-18
+map01250	Biosynthesis of nucleotide sugars	True	2026-11-18
+map01240	Biosynthesis of cofactors	True	2026-11-18
+map01220	Degradation of aromatic compounds	False	2026-11-18
+map01310	Nitrogen cycle	False	2026-11-18
+map01320	Sulfur cycle	True	2026-11-18
+map00010	Glycolysis / Gluconeogenesis	True	2026-11-18
+map00020	Citrate cycle (TCA cycle)	True	2026-11-18
+map00030	Pentose phosphate pathway	True	2026-11-18
+map00040	Pentose and glucuronate interconversions	True	2026-11-18
+map00051	Fructose and mannose metabolism	True	2026-11-18
+map00052	Galactose metabolism	True	2026-11-18
+map00053	Ascorbate and aldarate metabolism	True	2026-11-18
+map00500	Starch and sucrose metabolism	True	2026-11-18
+map00620	Pyruvate metabolism	True	2026-11-18
+map00630	Glyoxylate and dicarboxylate metabolism	True	2026-11-18
+map00640	Propanoate metabolism	True	2026-11-18
+map00650	Butanoate metabolism	True	2026-11-18
+map00660	C5-Branched dibasic acid metabolism	True	2026-11-18
+map00562	Inositol phosphate metabolism	True	2026-11-18
+map00566	Sulfoquinovose metabolism	False	2026-11-18
+map00190	Oxidative phosphorylation	True	2026-11-18
+map00195	Photosynthesis	False	2026-11-18
+map00196	Photosynthesis - antenna proteins	False	2026-11-18
+map00710	Carbon fixation by Calvin cycle	False	2026-11-18
+map00720	Other carbon fixation pathways	False	2026-11-18
+map00680	Methane metabolism	False	2026-11-18
+map00910	Nitrogen metabolism	True	2026-11-18
+map00920	Sulfur metabolism	True	2026-11-18
+map00061	Fatty acid biosynthesis	True	2026-11-18
+map00062	Fatty acid elongation	True	2026-11-18
+map00071	Fatty acid degradation	True	2026-11-18
+map00073	Cutin, suberine and wax biosynthesis	False	2026-11-18
+map00074	Mycolic acid biosynthesis	False	2026-11-18
+map00100	Steroid biosynthesis	True	2026-11-18
+map00120	Primary bile acid biosynthesis	True	2026-11-18
+map00121	Secondary bile acid biosynthesis	False	2026-11-18
+map00140	Steroid hormone biosynthesis	True	2026-11-18
+map00561	Glycerolipid metabolism	True	2026-11-18
+map00564	Glycerophospholipid metabolism	True	2026-11-18
+map00565	Ether lipid metabolism	True	2026-11-18
+map00600	Sphingolipid metabolism	True	2026-11-18
+map00590	Arachidonic acid metabolism	True	2026-11-18
+map00591	Linoleic acid metabolism	True	2026-11-18
+map00592	alpha-Linolenic acid metabolism	True	2026-11-18
+map01040	Biosynthesis of unsaturated fatty acids	True	2026-11-18
+map00230	Purine metabolism	True	2026-11-18
+map00240	Pyrimidine metabolism	True	2026-11-18
+map00250	Alanine, aspartate and glutamate metabolism	True	2026-11-18
+map00260	Glycine, serine and threonine metabolism	True	2026-11-18
+map00270	Cysteine and methionine metabolism	True	2026-11-18
+map00280	Valine, leucine and isoleucine degradation	True	2026-11-18
+map00290	Valine, leucine and isoleucine biosynthesis	True	2026-11-18
+map00300	Lysine biosynthesis	False	2026-11-18
+map00310	Lysine degradation	True	2026-11-18
+map00220	Arginine biosynthesis	True	2026-11-18
+map00330	Arginine and proline metabolism	True	2026-11-18
+map00340	Histidine metabolism	True	2026-11-18
+map00350	Tyrosine metabolism	True	2026-11-18
+map00360	Phenylalanine metabolism	True	2026-11-18
+map00380	Tryptophan metabolism	True	2026-11-18
+map00400	Phenylalanine, tyrosine and tryptophan biosynthesis	True	2026-11-18
+map00410	beta-Alanine metabolism	True	2026-11-18
+map00430	Taurine and hypotaurine metabolism	True	2026-11-18
+map00440	Phosphonate and phosphinate metabolism	True	2026-11-18
+map00450	Selenocompound metabolism	True	2026-11-18
+map00460	Cyanoamino acid metabolism	False	2026-11-18
+map00470	D-Amino acid metabolism	True	2026-11-18
+map00480	Glutathione metabolism	True	2026-11-18
+map00520	Amino sugar and nucleotide sugar metabolism	True	2026-11-18
+map00541	Biosynthesis of various nucleotide sugars	True	2026-11-18
+map00510	N-Glycan biosynthesis	True	2026-11-18
+map00513	Various types of N-glycan biosynthesis	True	2026-11-18
+map00512	Mucin type O-glycan biosynthesis	True	2026-11-18
+map00515	Mannose type O-glycan biosynthesis	True	2026-11-18
+map00514	Other types of O-glycan biosynthesis	True	2026-11-18
+map00532	Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate	True	2026-11-18
+map00534	Glycosaminoglycan biosynthesis - heparan sulfate / heparin	True	2026-11-18
+map00533	Glycosaminoglycan biosynthesis - keratan sulfate	True	2026-11-18
+map00531	Glycosaminoglycan degradation	True	2026-11-18
+map00563	Glycosylphosphatidylinositol (GPI)-anchor biosynthesis	True	2026-11-18
+map00601	Glycosphingolipid biosynthesis - lacto and neolacto series	True	2026-11-18
+map00603	Glycosphingolipid biosynthesis - globo and isoglobo series	True	2026-11-18
+map00604	Glycosphingolipid biosynthesis - ganglio series	True	2026-11-18
+map00511	Other glycan degradation	True	2026-11-18
+map00540	Lipopolysaccharide biosynthesis	False	2026-11-18
+map00542	O-Antigen repeat unit biosynthesis	False	2026-11-18
+map00550	Peptidoglycan biosynthesis	False	2026-11-18
+map00552	Teichoic acid biosynthesis	False	2026-11-18
+map00571	Lipoarabinomannan (LAM) biosynthesis	False	2026-11-18
+map00572	Arabinogalactan biosynthesis - Mycobacterium	False	2026-11-18
+map00543	Exopolysaccharide biosynthesis	False	2026-11-18
+map00730	Thiamine metabolism	True	2026-11-18
+map00740	Riboflavin metabolism	True	2026-11-18
+map00750	Vitamin B6 metabolism	True	2026-11-18
+map00760	Nicotinate and nicotinamide metabolism	True	2026-11-18
+map00770	Pantothenate and CoA biosynthesis	True	2026-11-18
+map00780	Biotin metabolism	True	2026-11-18
+map00785	Lipoic acid metabolism	True	2026-11-18
+map00790	Folate biosynthesis	True	2026-11-18
+map00670	One carbon pool by folate	True	2026-11-18
+map00830	Retinol metabolism	True	2026-11-18
+map00860	Porphyrin metabolism	True	2026-11-18
+map00130	Ubiquinone and other terpenoid-quinone biosynthesis	True	2026-11-18
+map00900	Terpenoid backbone biosynthesis	True	2026-11-18
+map00902	Monoterpenoid biosynthesis	False	2026-11-18
+map00909	Sesquiterpenoid and triterpenoid biosynthesis	False	2026-11-18
+map00904	Diterpenoid biosynthesis	False	2026-11-18
+map00906	Carotenoid biosynthesis	False	2026-11-18
+map00905	Brassinosteroid biosynthesis	False	2026-11-18
+map00981	Insect hormone biosynthesis	False	2026-11-18
+map00908	Zeatin biosynthesis	False	2026-11-18
+map00903	Limonene degradation	False	2026-11-18
+map00907	Pinene, camphor and geraniol degradation	False	2026-11-18
+map01052	Type I polyketide structures	False	2026-11-18
+map00522	Biosynthesis of 12-, 14- and 16-membered macrolides	False	2026-11-18
+map01051	Biosynthesis of ansamycins	False	2026-11-18
+map01059	Biosynthesis of enediyne antibiotics	False	2026-11-18
+map01056	Biosynthesis of type II polyketide backbone	False	2026-11-18
+map01057	Biosynthesis of type II polyketide products	False	2026-11-18
+map00253	Tetracycline biosynthesis	False	2026-11-18
+map00523	Polyketide sugar unit biosynthesis	False	2026-11-18
+map01054	Nonribosomal peptide structures	False	2026-11-18
+map01053	Biosynthesis of siderophore group nonribosomal peptides	False	2026-11-18
+map01055	Biosynthesis of vancomycin group antibiotics	False	2026-11-18
+map00940	Phenylpropanoid biosynthesis	False	2026-11-18
+map00945	Stilbenoid, diarylheptanoid and gingerol biosynthesis	False	2026-11-18
+map00941	Flavonoid biosynthesis	False	2026-11-18
+map00944	Flavone and flavonol biosynthesis	False	2026-11-18
+map00942	Anthocyanin biosynthesis	False	2026-11-18
+map00943	Isoflavonoid biosynthesis	False	2026-11-18
+map00946	Degradation of flavonoids	False	2026-11-18
+map00901	Indole alkaloid biosynthesis	False	2026-11-18
+map00403	Indole diterpene alkaloid biosynthesis	False	2026-11-18
+map00950	Isoquinoline alkaloid biosynthesis	False	2026-11-18
+map00960	Tropane, piperidine and pyridine alkaloid biosynthesis	False	2026-11-18
+map00996	Biosynthesis of various alkaloids	False	2026-11-18
+map00232	Caffeine metabolism	True	2026-11-18
+map00965	Betalain biosynthesis	False	2026-11-18
+map00966	Glucosinolate metabolism	False	2026-11-18
+map00402	Benzoxazinoid biosynthesis	False	2026-11-18
+map00311	Penicillin and cephalosporin biosynthesis	False	2026-11-18
+map00332	Carbapenem biosynthesis	False	2026-11-18
+map00261	Monobactam biosynthesis	False	2026-11-18
+map00331	Clavulanic acid biosynthesis	False	2026-11-18
+map00521	Streptomycin biosynthesis	False	2026-11-18
+map00524	Neomycin, kanamycin and gentamicin biosynthesis	True	2026-11-18
+map00525	Acarbose and validamycin biosynthesis	False	2026-11-18
+map00401	Novobiocin biosynthesis	False	2026-11-18
+map00404	Staurosporine biosynthesis	False	2026-11-18
+map00405	Phenazine biosynthesis	False	2026-11-18
+map00333	Prodigiosin biosynthesis	False	2026-11-18
+map00254	Aflatoxin biosynthesis	False	2026-11-18
+map00975	Biosynthesis of various siderophores	False	2026-11-18
+map00998	Biosynthesis of various antibiotics	False	2026-11-18
+map00999	Biosynthesis of various plant secondary metabolites	False	2026-11-18
+map00997	Biosynthesis of various other secondary metabolites	False	2026-11-18
+map00362	Benzoate degradation	False	2026-11-18
+map00627	Aminobenzoate degradation	False	2026-11-18
+map00364	Fluorobenzoate degradation	False	2026-11-18
+map00625	Chloroalkane and chloroalkene degradation	False	2026-11-18
+map00361	Chlorocyclohexane and chlorobenzene degradation	False	2026-11-18
+map00623	Toluene degradation	False	2026-11-18
+map00622	Xylene degradation	False	2026-11-18
+map00633	Nitrotoluene degradation	False	2026-11-18
+map00642	Ethylbenzene degradation	False	2026-11-18
+map00643	Styrene degradation	False	2026-11-18
+map00791	Atrazine degradation	False	2026-11-18
+map00930	Caprolactam degradation	False	2026-11-18
+map00363	Bisphenol degradation	False	2026-11-18
+map00621	Dioxin degradation	False	2026-11-18
+map00626	Naphthalene degradation	False	2026-11-18
+map00624	Polycyclic aromatic hydrocarbon degradation	False	2026-11-18
+map00365	Furfural degradation	False	2026-11-18
+map00984	Steroid degradation	False	2026-11-18
+map00980	Metabolism of xenobiotics by cytochrome P450	True	2026-11-18
+map00982	Drug metabolism - cytochrome P450	True	2026-11-18
+map00983	Drug metabolism - other enzymes	True	2026-11-18
+map01010	Overview of biosynthetic pathways	False	2026-11-18
+map01060	Biosynthesis of plant secondary metabolites	False	2026-11-18
+map01061	Biosynthesis of phenylpropanoids	False	2026-11-18
+map01062	Biosynthesis of terpenoids and steroids	False	2026-11-18
+map01063	Biosynthesis of alkaloids derived from shikimate pathway	False	2026-11-18
+map01064	Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid	False	2026-11-18
+map01065	Biosynthesis of alkaloids derived from histidine and purine	False	2026-11-18
+map01066	Biosynthesis of alkaloids derived from terpenoid and polyketide	False	2026-11-18
+map01070	Biosynthesis of plant hormones	False	2026-11-18
+map03020	RNA polymerase	True	2026-11-18
+map03022	Basal transcription factors	True	2026-11-18
+map03040	Spliceosome	True	2026-11-18
+map03010	Ribosome	True	2026-11-18
+map00970	Aminoacyl-tRNA biosynthesis	True	2026-11-18
+map03013	Nucleocytoplasmic transport	True	2026-11-18
+map03015	mRNA surveillance pathway	True	2026-11-18
+map03008	Ribosome biogenesis in eukaryotes	True	2026-11-18
+map03060	Protein export	True	2026-11-18
+map04141	Protein processing in endoplasmic reticulum	True	2026-11-18
+map04130	SNARE interactions in vesicular transport	True	2026-11-18
+map04120	Ubiquitin mediated proteolysis	True	2026-11-18
+map04122	Sulfur relay system	True	2026-11-18
+map03050	Proteasome	True	2026-11-18
+map03018	RNA degradation	True	2026-11-18
+map03030	DNA replication	True	2026-11-18
+map03410	Base excision repair	True	2026-11-18
+map03420	Nucleotide excision repair	True	2026-11-18
+map03430	Mismatch repair	True	2026-11-18
+map03440	Homologous recombination	True	2026-11-18
+map03450	Non-homologous end-joining	True	2026-11-18
+map03460	Fanconi anemia pathway	True	2026-11-18
+map03082	ATP-dependent chromatin remodeling	True	2026-11-18
+map03083	Polycomb repressive complex	True	2026-11-18
+map03230	Viral genome structure	False	2026-11-18
+map03240	Viral replication	False	2026-11-18
+map03250	Viral life cycle - HIV-1	True	2026-11-18
+map03260	Virion - Human immunodeficiency virus	True	2026-11-18
+map03271	Virion - Rotavirus	True	2026-11-18
+map03262	Virion - Coronavirus	False	2026-11-18
+map03261	Virion - Influenza virus	False	2026-11-18
+map03263	Virion - Enterovirus	False	2026-11-18
+map03264	Virion - Flavivirus and Alphavirus	True	2026-11-18
+map03265	Virion - Ebolavirus, Lyssavirus and Morbillivirus	True	2026-11-18
+map03273	Virion - Lassa virus and SFTS virus	True	2026-11-18
+map03272	Virion - Hepatitis viruses	True	2026-11-18
+map03266	Virion - Herpesvirus	True	2026-11-18
+map03268	Virion - Orthopoxvirus	False	2026-11-18
+map03267	Virion - Adenovirus	True	2026-11-18
+map03259	Virion - Bacteriophages T4 and T7	False	2026-11-18
+map03258	Virion - Bacteriophage lambda	False	2026-11-18
+map02010	ABC transporters	True	2026-11-18
+map02060	Phosphotransferase system (PTS)	False	2026-11-18
+map03070	Bacterial secretion system	False	2026-11-18
+map02020	Two-component system	False	2026-11-18
+map04010	MAPK signaling pathway	True	2026-11-18
+map04013	MAPK signaling pathway - fly	False	2026-11-18
+map04016	MAPK signaling pathway - plant	False	2026-11-18
+map04011	MAPK signaling pathway - yeast	False	2026-11-18
+map04012	ErbB signaling pathway	True	2026-11-18
+map04014	Ras signaling pathway	True	2026-11-18
+map04015	Rap1 signaling pathway	True	2026-11-18
+map04310	Wnt signaling pathway	True	2026-11-18
+map04330	Notch signaling pathway	True	2026-11-18
+map04340	Hedgehog signaling pathway	True	2026-11-18
+map04341	Hedgehog signaling pathway - fly	False	2026-11-18
+map04350	TGF-beta signaling pathway	True	2026-11-18
+map04390	Hippo signaling pathway	True	2026-11-18
+map04391	Hippo signaling pathway - fly	False	2026-11-18
+map04392	Hippo signaling pathway - multiple species	True	2026-11-18
+map04370	VEGF signaling pathway	True	2026-11-18
+map04371	Apelin signaling pathway	True	2026-11-18
+map04630	JAK-STAT signaling pathway	True	2026-11-18
+map04064	NF-kappa B signaling pathway	True	2026-11-18
+map04668	TNF signaling pathway	True	2026-11-18
+map04066	HIF-1 signaling pathway	True	2026-11-18
+map04068	FoxO signaling pathway	True	2026-11-18
+map04020	Calcium signaling pathway	True	2026-11-18
+map04070	Phosphatidylinositol signaling system	True	2026-11-18
+map04072	Phospholipase D signaling pathway	True	2026-11-18
+map04071	Sphingolipid signaling pathway	True	2026-11-18
+map04024	cAMP signaling pathway	True	2026-11-18
+map04022	cGMP-PKG signaling pathway	True	2026-11-18
+map04151	PI3K-Akt signaling pathway	True	2026-11-18
+map04152	AMPK signaling pathway	True	2026-11-18
+map04150	mTOR signaling pathway	True	2026-11-18
+map04075	Plant hormone signal transduction	False	2026-11-18
+map04080	Neuroactive ligand-receptor interaction	True	2026-11-18
+map04082	Neuroactive ligand signaling	True	2026-11-18
+map04081	Hormone signaling	True	2026-11-18
+map04060	Cytokine-cytokine receptor interaction	True	2026-11-18
+map04061	Viral protein interaction with cytokine and cytokine receptor	True	2026-11-18
+map04512	ECM-receptor interaction	True	2026-11-18
+map04514	Cell adhesion molecule (CAM) interaction	True	2026-11-18
+map04517	IgSF CAM signaling	True	2026-11-18
+map04518	Integrin signaling	True	2026-11-18
+map04519	Cadherin signaling	True	2026-11-18
+map04144	Endocytosis	True	2026-11-18
+map04145	Phagocytosis	True	2026-11-18
+map04142	Lysosome biogenesis	True	2026-11-18
+map04146	Peroxisome	True	2026-11-18
+map04149	Peroxisome - yeast	False	2026-11-18
+map04140	Autophagy - animal	True	2026-11-18
+map04138	Autophagy - yeast	False	2026-11-18
+map04136	Autophagy - other	True	2026-11-18
+map04137	Mitophagy - animal	True	2026-11-18
+map04139	Mitophagy - yeast	False	2026-11-18
+map04148	Efferocytosis	True	2026-11-18
+map04110	Cell cycle	True	2026-11-18
+map04111	Cell cycle - yeast	False	2026-11-18
+map04112	Cell cycle - Caulobacter	False	2026-11-18
+map04113	Meiosis - yeast	False	2026-11-18
+map04114	Oocyte meiosis	True	2026-11-18
+map04210	Apoptosis	True	2026-11-18
+map04214	Apoptosis - fly	False	2026-11-18
+map04215	Apoptosis - multiple species	True	2026-11-18
+map04216	Ferroptosis	True	2026-11-18
+map04217	Necroptosis	True	2026-11-18
+map04115	p53 signaling pathway	True	2026-11-18
+map04218	Cellular senescence	True	2026-11-18
+map04156	Integrated stress response (ISR) signaling pathway	True	2026-11-18
+map04510	Focal adhesion	True	2026-11-18
+map04520	Adherens junction	True	2026-11-18
+map04530	Tight junction	True	2026-11-18
+map04540	Gap junction	True	2026-11-18
+map04550	Signaling pathways regulating pluripotency of stem cells	True	2026-11-18
+map02024	Quorum sensing	False	2026-11-18
+map05111	Biofilm formation - Vibrio cholerae	False	2026-11-18
+map02025	Biofilm formation - Pseudomonas aeruginosa	False	2026-11-18
+map02026	Biofilm formation - Escherichia coli	False	2026-11-18
+map02030	Bacterial chemotaxis	False	2026-11-18
+map02040	Flagellar assembly	False	2026-11-18
+map04814	Motor proteins	True	2026-11-18
+map04820	Cytoskeleton in muscle cells	True	2026-11-18
+map04810	Regulation of actin cytoskeleton	True	2026-11-18
+map04640	Hematopoietic cell lineage	True	2026-11-18
+map04610	Complement and coagulation cascades	True	2026-11-18
+map04611	Platelet activation	True	2026-11-18
+map04613	Neutrophil extracellular trap formation	True	2026-11-18
+map04620	Toll-like receptor signaling pathway	True	2026-11-18
+map04624	Toll and Imd signaling pathway	False	2026-11-18
+map04621	NOD-like receptor signaling pathway	True	2026-11-18
+map04622	RIG-I-like receptor signaling pathway	True	2026-11-18
+map04623	Cytosolic DNA-sensing pathway	True	2026-11-18
+map04625	C-type lectin receptor signaling pathway	True	2026-11-18
+map04650	Natural killer cell mediated cytotoxicity	True	2026-11-18
+map04612	Antigen processing and presentation	True	2026-11-18
+map04660	T cell receptor signaling pathway	True	2026-11-18
+map04658	Th1 and Th2 cell differentiation	True	2026-11-18
+map04659	Th17 cell differentiation	True	2026-11-18
+map04657	IL-17 signaling pathway	True	2026-11-18
+map04662	B cell receptor signaling pathway	True	2026-11-18
+map04664	Fc epsilon RI signaling pathway	True	2026-11-18
+map04666	Fc gamma R-mediated phagosome formation	True	2026-11-18
+map04670	Leukocyte transendothelial migration	True	2026-11-18
+map04672	Intestinal immune network for IgA production	True	2026-11-18
+map04062	Chemokine signaling pathway	True	2026-11-18
+map04911	Insulin secretion	True	2026-11-18
+map04910	Insulin signaling pathway	True	2026-11-18
+map04922	Glucagon signaling pathway	True	2026-11-18
+map04923	Regulation of lipolysis in adipocytes	True	2026-11-18
+map04920	Adipocytokine signaling pathway	True	2026-11-18
+map03320	PPAR signaling pathway	True	2026-11-18
+map04900	Neuroendocrine signaling pathway of hypothalamus-pituitary axis	True	2026-11-18
+map04929	GnRH secretion	True	2026-11-18
+map04912	GnRH signaling pathway	True	2026-11-18
+map04913	Ovarian steroidogenesis	True	2026-11-18
+map04915	Estrogen signaling pathway	True	2026-11-18
+map04914	Progesterone-mediated oocyte maturation	True	2026-11-18
+map04917	Prolactin signaling pathway	True	2026-11-18
+map04921	Oxytocin signaling pathway	True	2026-11-18
+map04926	Relaxin signaling pathway	True	2026-11-18
+map04935	Growth hormone synthesis, secretion and action	True	2026-11-18
+map04918	Thyroid hormone synthesis	True	2026-11-18
+map04919	Thyroid hormone signaling pathway	True	2026-11-18
+map04928	Parathyroid hormone synthesis, secretion and action	True	2026-11-18
+map04916	Melanogenesis	True	2026-11-18
+map04924	Renin secretion	True	2026-11-18
+map04614	Renin-angiotensin system	True	2026-11-18
+map04925	Aldosterone synthesis and secretion	True	2026-11-18
+map04927	Cortisol synthesis and secretion	True	2026-11-18
+map04260	Cardiac muscle contraction	True	2026-11-18
+map04261	Adrenergic signaling in cardiomyocytes	True	2026-11-18
+map04270	Vascular smooth muscle contraction	True	2026-11-18
+map04970	Salivary secretion	True	2026-11-18
+map04971	Gastric acid secretion	True	2026-11-18
+map04972	Pancreatic secretion	True	2026-11-18
+map04976	Bile secretion	True	2026-11-18
+map04973	Carbohydrate digestion and absorption	True	2026-11-18
+map04974	Protein digestion and absorption	True	2026-11-18
+map04975	Fat digestion and absorption	True	2026-11-18
+map04979	Cholesterol metabolism	True	2026-11-18
+map04977	Vitamin digestion and absorption	True	2026-11-18
+map04981	Folate transport and metabolism	True	2026-11-18
+map04980	Cobalamin transport and metabolism	True	2026-11-18
+map04978	Mineral absorption	True	2026-11-18
+map04962	Vasopressin-regulated water reabsorption	True	2026-11-18
+map04960	Aldosterone-regulated sodium reabsorption	True	2026-11-18
+map04961	Endocrine and other factor-regulated calcium reabsorption	True	2026-11-18
+map04964	Proximal tubule bicarbonate reclamation	True	2026-11-18
+map04966	Collecting duct acid secretion	True	2026-11-18
+map04724	Glutamatergic synapse	True	2026-11-18
+map04727	GABAergic synapse	True	2026-11-18
+map04725	Cholinergic synapse	True	2026-11-18
+map04728	Dopaminergic synapse	True	2026-11-18
+map04726	Serotonergic synapse	True	2026-11-18
+map04720	Long-term potentiation	True	2026-11-18
+map04730	Long-term depression	True	2026-11-18
+map04723	Retrograde endocannabinoid signaling	True	2026-11-18
+map04721	Synaptic vesicle cycle	True	2026-11-18
+map04722	Neurotrophin signaling pathway	True	2026-11-18
+map04744	Phototransduction	True	2026-11-18
+map04745	Phototransduction - fly	False	2026-11-18
+map04740	Olfactory transduction	True	2026-11-18
+map04742	Taste transduction	True	2026-11-18
+map04750	Inflammatory mediator regulation of TRP channels	True	2026-11-18
+map04320	Dorso-ventral axis formation	False	2026-11-18
+map04360	Axon guidance	True	2026-11-18
+map04361	Axon regeneration	False	2026-11-18
+map04380	Osteoclast differentiation	True	2026-11-18
+map04382	Cornified envelope formation	True	2026-11-18
+map04211	Longevity regulating pathway	True	2026-11-18
+map04212	Longevity regulating pathway - worm	False	2026-11-18
+map04213	Longevity regulating pathway - multiple species	True	2026-11-18
+map04710	Circadian rhythm	True	2026-11-18
+map04713	Circadian entrainment	True	2026-11-18
+map04711	Circadian rhythm - fly	False	2026-11-18
+map04712	Circadian rhythm - plant	False	2026-11-18
+map04714	Thermogenesis	True	2026-11-18
+map04626	Plant-pathogen interaction	False	2026-11-18
+map05200	Pathways in cancer	True	2026-11-18
+map05202	Transcriptional misregulation in cancer	True	2026-11-18
+map05206	MicroRNAs in cancer	True	2026-11-18
+map05205	Proteoglycans in cancer	True	2026-11-18
+map05204	Chemical carcinogenesis - DNA adducts	True	2026-11-18
+map05207	Chemical carcinogenesis - receptor activation	True	2026-11-18
+map05208	Chemical carcinogenesis - reactive oxygen species	True	2026-11-18
+map05203	Viral carcinogenesis	True	2026-11-18
+map05230	Central carbon metabolism in cancer	True	2026-11-18
+map05231	Choline metabolism in cancer	True	2026-11-18
+map05235	PD-L1 expression and PD-1 checkpoint pathway in cancer	True	2026-11-18
+map05210	Colorectal cancer	True	2026-11-18
+map05212	Pancreatic cancer	True	2026-11-18
+map05225	Hepatocellular carcinoma	True	2026-11-18
+map05226	Gastric cancer	True	2026-11-18
+map05214	Glioma	True	2026-11-18
+map05216	Thyroid cancer	True	2026-11-18
+map05221	Acute myeloid leukemia	True	2026-11-18
+map05220	Chronic myeloid leukemia	True	2026-11-18
+map05217	Basal cell carcinoma	True	2026-11-18
+map05218	Melanoma	True	2026-11-18
+map05211	Renal cell carcinoma	True	2026-11-18
+map05219	Bladder cancer	True	2026-11-18
+map05215	Prostate cancer	True	2026-11-18
+map05213	Endometrial cancer	True	2026-11-18
+map05224	Breast cancer	True	2026-11-18
+map05222	Small cell lung cancer	True	2026-11-18
+map05223	Non-small cell lung cancer	True	2026-11-18
+map05166	Human T-cell leukemia virus 1 infection	True	2026-11-18
+map05170	Human immunodeficiency virus 1 infection	True	2026-11-18
+map05161	Hepatitis B	True	2026-11-18
+map05160	Hepatitis C	True	2026-11-18
+map05171	Coronavirus disease	True	2026-11-18
+map05164	Influenza A	True	2026-11-18
+map05162	Measles	True	2026-11-18
+map05168	Herpes simplex virus 1 infection	True	2026-11-18
+map05163	Human cytomegalovirus infection	True	2026-11-18
+map05167	Kaposi sarcoma-associated herpesvirus infection	True	2026-11-18
+map05169	Epstein-Barr virus infection	True	2026-11-18
+map05165	Human papillomavirus infection	True	2026-11-18
+map05110	Vibrio cholerae infection	True	2026-11-18
+map05120	Epithelial cell signaling in Helicobacter pylori infection	True	2026-11-18
+map05130	Pathogenic Escherichia coli infection	True	2026-11-18
+map05132	Salmonella infection	True	2026-11-18
+map05131	Shigellosis	True	2026-11-18
+map05135	Yersinia infection	True	2026-11-18
+map05133	Pertussis	True	2026-11-18
+map05134	Legionellosis	True	2026-11-18
+map05150	Staphylococcus aureus infection	True	2026-11-18
+map05152	Tuberculosis	True	2026-11-18
+map05100	Bacterial invasion of epithelial cells	True	2026-11-18
+map05146	Amoebiasis	True	2026-11-18
+map05144	Malaria	True	2026-11-18
+map05145	Toxoplasmosis	True	2026-11-18
+map05140	Leishmaniasis	True	2026-11-18
+map05142	Chagas disease	True	2026-11-18
+map05143	African trypanosomiasis	True	2026-11-18
+map05310	Asthma	True	2026-11-18
+map05322	Systemic lupus erythematosus	True	2026-11-18
+map05323	Rheumatoid arthritis	True	2026-11-18
+map05320	Autoimmune thyroid disease	True	2026-11-18
+map05321	Inflammatory bowel disease	True	2026-11-18
+map05330	Allograft rejection	True	2026-11-18
+map05332	Graft-versus-host disease	True	2026-11-18
+map05340	Primary immunodeficiency	True	2026-11-18
+map05010	Alzheimer disease	True	2026-11-18
+map05012	Parkinson disease	True	2026-11-18
+map05014	Amyotrophic lateral sclerosis	True	2026-11-18
+map05016	Huntington disease	True	2026-11-18
+map05017	Spinocerebellar ataxia	True	2026-11-18
+map05020	Prion disease	True	2026-11-18
+map05022	Pathways of neurodegeneration - multiple diseases	True	2026-11-18
+map05030	Cocaine addiction	True	2026-11-18
+map05031	Amphetamine addiction	True	2026-11-18
+map05032	Morphine addiction	True	2026-11-18
+map05033	Nicotine addiction	True	2026-11-18
+map05034	Alcoholism	True	2026-11-18
+map05417	Lipid and atherosclerosis	True	2026-11-18
+map05418	Fluid shear stress and atherosclerosis	True	2026-11-18
+map05410	Hypertrophic cardiomyopathy	True	2026-11-18
+map05412	Arrhythmogenic right ventricular cardiomyopathy	True	2026-11-18
+map05414	Dilated cardiomyopathy	True	2026-11-18
+map05415	Diabetic cardiomyopathy	True	2026-11-18
+map05416	Viral myocarditis	True	2026-11-18
+map04930	Type II diabetes mellitus	True	2026-11-18
+map04940	Type I diabetes mellitus	True	2026-11-18
+map04950	Maturity onset diabetes of the young	True	2026-11-18
+map04936	Alcoholic liver disease	True	2026-11-18
+map04932	Non-alcoholic fatty liver disease	True	2026-11-18
+map04931	Insulin resistance	True	2026-11-18
+map04933	AGE-RAGE signaling pathway in diabetic complications	True	2026-11-18
+map04934	Cushing syndrome	True	2026-11-18
+map01501	beta-Lactam resistance	False	2026-11-18
+map01502	Vancomycin resistance	False	2026-11-18
+map01503	Cationic antimicrobial peptide (CAMP) resistance	False	2026-11-18
+map01521	EGFR tyrosine kinase inhibitor resistance	True	2026-11-18
+map01524	Platinum drug resistance	True	2026-11-18
+map01523	Antifolate resistance	True	2026-11-18
+map01522	Endocrine resistance	True	2026-11-18
+map07011	Penicillins	False	2026-11-18
+map07012	Cephalosporins - parenteral agents	False	2026-11-18
+map07013	Cephalosporins - oral agents	False	2026-11-18
+map07021	Aminoglycosides	False	2026-11-18
+map07019	Tetracyclines	False	2026-11-18
+map07020	Macrolides and ketolides	False	2026-11-18
+map07014	Quinolones	False	2026-11-18
+map07023	Rifamycins	False	2026-11-18
+map07026	Antifungal agents	False	2026-11-18
+map07044	Antiviral agents	False	2026-11-18
+map07053	Anti-HIV agents	False	2026-11-18
+map07040	Antineoplastics - alkylating agents	False	2026-11-18
+map07041	Antineoplastics - antimetabolic agents	False	2026-11-18
+map07042	Antineoplastics - agents from natural products	False	2026-11-18
+map07043	Antineoplastics - hormones	False	2026-11-18
+map07045	Antineoplastics - protein kinase inhibitors	False	2026-11-18
+map07032	Hypnotics	False	2026-11-18
+map07030	Anxiolytics	False	2026-11-18
+map07033	Anticonvulsants	False	2026-11-18
+map07015	Local analgesics	False	2026-11-18
+map07039	Opioid analgesics	False	2026-11-18
+map07028	Antipsychotics	False	2026-11-18
+map07029	Antipsychotics - phenothiazines	False	2026-11-18
+map07031	Antipsychotics - butyrophenones	False	2026-11-18
+map07027	Antidepressants	False	2026-11-18
+map07056	Agents for Alzheimer-type dementia	False	2026-11-18
+map07057	Antiparkinsonian agents	False	2026-11-18
+map07055	Sulfonamide derivatives - overview	False	2026-11-18
+map07016	Sulfonamide derivatives - sulfa drugs	False	2026-11-18
+map07017	Sulfonamide derivatives - diuretics	False	2026-11-18
+map07018	Sulfonamide derivatives - hypoglycemic agents	False	2026-11-18
+map07037	Antiarrhythmic drugs	False	2026-11-18
+map07038	Antiulcer drugs	False	2026-11-18
+map07046	Immunosuppressive agents	False	2026-11-18
+map07047	Osteoporosis drugs	False	2026-11-18
+map07048	Antimigraines	False	2026-11-18
+map07049	Antithrombosis agents	False	2026-11-18
+map07050	Antirheumatics - DMARDs and biological agents	False	2026-11-18
+map07051	Antidiabetics	False	2026-11-18
+map07052	Antidyslipidemic agents	False	2026-11-18
+map07054	Antiglaucoma agents	False	2026-11-18
+map07220	Cholinergic and anticholinergic drugs	False	2026-11-18
+map07215	alpha-Adrenergic receptor agonists/antagonists	False	2026-11-18
+map07214	beta-Adrenergic receptor agonists/antagonists	False	2026-11-18
+map07213	Dopamine receptor agonists/antagonists	False	2026-11-18
+map07212	Histamine H1 receptor antagonists	False	2026-11-18
+map07227	Histamine H2/H3 receptor agonists/antagonists	False	2026-11-18
+map07211	Serotonin receptor agonists/antagonists	False	2026-11-18
+map07228	Eicosanoid receptor agonists/antagonists	False	2026-11-18
+map07224	Opioid receptor agonists/antagonists	False	2026-11-18
+map07229	Angiotensin receptor and endothelin receptor antagonists	False	2026-11-18
+map07225	Glucocorticoid and mineralocorticoid receptor agonists/antagonists	False	2026-11-18
+map07226	Progesterone, androgen and estrogen receptor agonists/antagonists	False	2026-11-18
+map07223	Retinoic acid receptor (RAR) and retinoid X receptor (RXR) agonists/antagonists	False	2026-11-18
+map07222	Peroxisome proliferator-activated receptor (PPAR) agonists	False	2026-11-18
+map07221	Nicotinic cholinergic receptor antagonists	False	2026-11-18
+map07230	GABA-A receptor agonists/antagonists	False	2026-11-18
+map07036	Calcium channel blocking drugs	False	2026-11-18
+map07231	Sodium channel blocking drugs	False	2026-11-18
+map07232	Potassium channel blocking and opening drugs	False	2026-11-18
+map07235	N-Methyl-D-aspartic acid (NMDA) receptor antagonists	False	2026-11-18
+map07233	Ion transporter inhibitors	False	2026-11-18
+map07234	Neurotransmitter transporter inhibitors	False	2026-11-18
+map07216	Catecholamine transferase inhibitors	False	2026-11-18
+map07219	Cyclooxygenase inhibitors	False	2026-11-18
+map07024	HMG-CoA reductase inhibitors	False	2026-11-18
+map07217	Renin-angiotensin system inhibitors	False	2026-11-18
+map07218	HIV protease inhibitors	False	2026-11-18
+map07025	Quinolines	False	2026-11-18
+map07034	Eicosanoids	False	2026-11-18
+map07035	Prostaglandins	False	2026-11-18
+map07110	Benzoic acid family	False	2026-11-18
+map07112	1,2-Diphenyl substitution family	False	2026-11-18
+map07114	Naphthalene family	False	2026-11-18
+map07117	Benzodiazepine family	False	2026-11-18

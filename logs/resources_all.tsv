@@ -1,0 +1,20 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note
+01_install	98	NA	3.25	3.25	masscube 1.2.22, R version 4.6.2 (2026-10-29 ucrt), ThermoRawFileParser 1.4.5
+01_install	2007	NA	0.00	2.43	masscube 1.2.22, R version 4.6.2 (2026-10-29 ucrt), ThermoRawFileParser 1.4.5
+02_download_metadata	55	44	4.53	4.53	229 raw files, 72715682516 bytes
+03_sample_table	2	15	3.25	3.25	229 files across both modes
+04_pilot_neg	607	1033	7.57	7.78	6 files of this mode in the manifest
+04_pilot_pos	418	1100	4.40	4.66	6 files of this mode in the manifest
+04_process_neg	35347	1338	6.09	8.07	114 files of this mode in the manifest
+04_process_pos	18115	1458	2.79	7.16	115 files of this mode in the manifest
+05_rules_neg	620	154	7.78	6.09	2026-11-17T07:45:11Z
+05_rules_pos	430	199	4.65	2.79	already widened
+06_align_neg	9138	3745	8.07	5.31	67624 aligned features from 114 files
+06_align_pos	11655	5100	7.16	5.88	91654 aligned features from 115 files
+07_annotate	26426	5919	5.31	7.01	2706405 spectra, loaded in 22.7 s, +3174 MB
+08_qc_filters	159	945	7.09	7.11	positive control passes: False
+09_statistics	62	221	7.11	7.12	scripts/09_statistics.R
+10_classifier	42988	2318	7.12	7.12	scripts/lib/classifier.py
+10_pathways	786	139	7.12	7.12	scripts/lib/pathways.py
+10_permanova	13	280	7.12	7.12	scripts/10_permanova.R
+11_figures	78	385	7.32	7.32	scripts/11_figures.R

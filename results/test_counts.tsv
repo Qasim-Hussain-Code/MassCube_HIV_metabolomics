@@ -1,0 +1,22 @@
+mode	analysis	tested	called	higher_in_plwh	lower_in_plwh	n_reference	n_comparison
+positive	primary limma	3898	1225	530	695	34	70
+positive	welch	3898	1264	589	675		
+positive	wilcoxon	3898	1253	552	701		
+positive	half_minimum_imputation	3898	1882	842	1040		
+positive	injection_order_covariate	3898	109	54	55		
+positive	all_injections	3898	1225	530	695		
+positive	area	3898	1350	911	439		
+positive	rsd20	3048	937	432	505		
+positive	with_lowess	3898	1314	651	663		
+positive	without_qc11	3856	1200	522	678		
+positive	exploratory INR against IR	3953	424			38	32
+negative	primary limma	2190	563	210	353	30	68
+negative	welch	2190	634	268	366		
+negative	wilcoxon	2190	601	223	378		
+negative	half_minimum_imputation	2190	1064	417	647		
+negative	injection_order_covariate	2190	335	125	210		
+negative	all_injections	2191	556	203	353		
+negative	area	2190	558	171	387		
+negative	rsd20	1602	393	146	247		
+negative	with_lowess	2190	601	268	333		
+negative	exploratory INR against IR	2296	116			37	31

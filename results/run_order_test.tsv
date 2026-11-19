@@ -1,0 +1,3 @@
+mode	n_plwh	n_hc	median_order_plwh	median_order_hc	U	p	associated
+positive	70	34	78.5	17.5	2380.0	1.6830196945382107e-16	True
+negative	70	34	37.5	78.5	612.0	6.285237771203323e-05	True

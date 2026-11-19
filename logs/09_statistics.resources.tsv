@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+09_statistics	62	221	7.11	7.12	scripts/09_statistics.R	2026-11-18T11:52:47+0800

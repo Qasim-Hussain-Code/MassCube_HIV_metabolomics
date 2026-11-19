@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+06_align_neg	9138	3745	8.07	5.31	67624 aligned features from 114 files	2026-11-18T04:16:52+0800

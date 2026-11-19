@@ -1,0 +1,2 @@
+stage	elapsed_s	peak_rss_mb	disk_before_gb	disk_after_gb	note	finished
+11_figures	78	385	7.32	7.32	scripts/11_figures.R	2026-11-19T11:32:11+0800
